@@ -1658,8 +1658,21 @@
         const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
         
+        // 检查配置
+        const isConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+        
         // 初始化 Supabase 客户端
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        let db = null;
+        if (isConfigured) {
+            try {
+                db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('Supabase initialized successfully');
+            } catch (err) {
+                console.error('Failed to initialize Supabase:', err);
+            }
+        } else {
+            console.warn('⚠️ Supabase not configured! Please set SUPABASE_URL and SUPABASE_ANON_KEY');
+        }
 
         // =====================
         // DATA STORE
@@ -1671,9 +1684,14 @@
 
         // 加载数据
         async function loadData() {
+            if (!db) {
+                console.error('Supabase not initialized');
+                return;
+            }
+            
             try {
                 // 获取用户列表
-                const { data: usersData, error: usersError } = await supabase
+                const { data: usersData, error: usersError } = await db
                     .from('profiles')
                     .select('id, name, email, role');
                 
@@ -1681,7 +1699,7 @@
                 users = usersData || [];
 
                 // 获取项目列表（RLS 会自动过滤）
-                const { data: projectsData, error: projectsError } = await supabase
+                const { data: projectsData, error: projectsError } = await db
                     .from('projects')
                     .select(`
                         *,
@@ -1716,7 +1734,9 @@
 
         // 加载项目活动日志
         async function loadActivities(projectId) {
-            const { data, error } = await supabase
+            if (!db) return [];
+            
+            const { data, error } = await db
                 .from('activities')
                 .select('description, created_at')
                 .eq('project_id', projectId)
@@ -2208,8 +2228,12 @@
         // AUTH (Supabase)
         // =====================
         async function login(email, password) {
+            if (!db) {
+                return { success: false, error: 'Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY in the code.' };
+            }
+            
             try {
-                const { data, error } = await supabase.auth.signInWithPassword({
+                const { data, error } = await db.auth.signInWithPassword({
                     email,
                     password
                 });
@@ -2217,7 +2241,7 @@
                 if (error) throw error;
                 
                 // 获取用户资料
-                const { data: profile, error: profileError } = await supabase
+                const { data: profile, error: profileError } = await db
                     .from('profiles')
                     .select('*')
                     .eq('id', data.user.id)
@@ -2234,7 +2258,9 @@
         }
 
         async function logout() {
-            await supabase.auth.signOut();
+            if (db) {
+                await db.auth.signOut();
+            }
             currentUser = null;
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('dashboard').classList.remove('active');
@@ -2243,8 +2269,12 @@
         }
 
         async function register(name, email, password) {
+            if (!db) {
+                return { success: false, error: 'Supabase not configured. Please set SUPABASE_URL and SUPABASE_ANON_KEY in the code.' };
+            }
+            
             try {
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await db.auth.signUp({
                     email,
                     password,
                     options: {
@@ -2705,7 +2735,7 @@
             if (!confirm(t('confirmDelete'))) return;
             
             try {
-                const { error } = await supabase
+                const { error } = await db
                     .from('projects')
                     .delete()
                     .eq('id', id);
@@ -2751,7 +2781,7 @@
             try {
                 if (id) {
                     // Edit existing
-                    const { error } = await supabase
+                    const { error } = await db
                         .from('projects')
                         .update(projectData)
                         .eq('id', id);
@@ -2759,14 +2789,14 @@
                     if (error) throw error;
                     
                     // Add activity
-                    await supabase
+                    await db
                         .from('activities')
                         .insert({ project_id: id, description: t('activityUpdated') });
                     
                     showToast(t('projectUpdated'));
                 } else {
                     // Add new
-                    const { data, error } = await supabase
+                    const { data, error } = await db
                         .from('projects')
                         .insert(projectData)
                         .select()
@@ -2775,7 +2805,7 @@
                     if (error) throw error;
                     
                     // Add activity
-                    await supabase
+                    await db
                         .from('activities')
                         .insert({ project_id: data.id, description: t('activityCreated') });
                     
@@ -2808,7 +2838,7 @@
 
             try {
                 // Create user via Supabase Auth
-                const { data, error } = await supabase.auth.signUp({
+                const { data, error } = await db.auth.signUp({
                     email,
                     password,
                     options: {
@@ -2820,7 +2850,7 @@
                 
                 // Update role if manager
                 if (role === 'manager' && data.user) {
-                    await supabase
+                    await db
                         .from('profiles')
                         .update({ role: 'manager' })
                         .eq('id', data.user.id);
@@ -2843,7 +2873,7 @@
                 // Note: Deleting users requires admin privileges
                 // In production, you'd use a server function
                 // For now, we just unassign their projects
-                const { error } = await supabase
+                const { error } = await db
                     .from('projects')
                     .update({ assigned_to: null })
                     .eq('assigned_to', id);
@@ -2851,7 +2881,7 @@
                 if (error) throw error;
                 
                 // Update profile to mark as inactive (optional)
-                await supabase
+                await db
                     .from('profiles')
                     .delete()
                     .eq('id', id);
@@ -3002,37 +3032,55 @@
             updateLangButtons();
             updateAllText();
             
-            const { data: { session } } = await supabase.auth.getSession();
+            // Check if Supabase is configured
+            if (!isConfigured) {
+                alert('⚠️ 请先配置 Supabase!\n\n1. 打开 index.html\n2. 找到 SUPABASE_URL 和 SUPABASE_ANON_KEY\n3. 替换为您的 Supabase 项目配置\n\nPlease configure Supabase first!');
+                showLoginForm();
+                return;
+            }
             
-            if (session) {
-                // Get user profile
-                const { data: profile, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', session.user.id)
-                    .single();
+            if (!db) {
+                console.error('Supabase client not initialized');
+                showLoginForm();
+                return;
+            }
+            
+            try {
+                const { data: { session } } = await db.auth.getSession();
                 
-                if (profile && !error) {
-                    currentUser = profile;
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('dashboard').classList.add('active');
-                    await updateUI();
+                if (session) {
+                    // Get user profile
+                    const { data: profile, error } = await db
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', session.user.id)
+                        .single();
+                    
+                    if (profile && !error) {
+                        currentUser = profile;
+                        document.getElementById('loginPage').style.display = 'none';
+                        document.getElementById('dashboard').classList.add('active');
+                        await updateUI();
+                    } else {
+                        showLoginForm();
+                    }
                 } else {
                     showLoginForm();
                 }
-            } else {
+                
+                // Listen for auth changes
+                db.auth.onAuthStateChange(async (event, session) => {
+                    if (event === 'SIGNED_OUT') {
+                        currentUser = null;
+                        document.getElementById('loginPage').style.display = 'flex';
+                        document.getElementById('dashboard').classList.remove('active');
+                        document.body.classList.remove('is-manager');
+                    }
+                });
+            } catch (err) {
+                console.error('Init error:', err);
                 showLoginForm();
             }
-            
-            // Listen for auth changes
-            supabase.auth.onAuthStateChange(async (event, session) => {
-                if (event === 'SIGNED_OUT') {
-                    currentUser = null;
-                    document.getElementById('loginPage').style.display = 'flex';
-                    document.getElementById('dashboard').classList.remove('active');
-                    document.body.classList.remove('is-manager');
-                }
-            });
         })();
     </script>
 </body>

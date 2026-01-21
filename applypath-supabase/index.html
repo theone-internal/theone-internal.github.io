@@ -1,0 +1,3039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApplyPath — University Application Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #FAF9F7;
+            --bg-secondary: #FFFFFF;
+            --bg-accent: #F0EDE8;
+            --text-primary: #1A1A1A;
+            --text-secondary: #5C5C5C;
+            --text-muted: #8C8C8C;
+            --accent-primary: #2D5A4A;
+            --accent-secondary: #4A8B6F;
+            --accent-light: #E8F2ED;
+            --border-color: #E5E2DC;
+            --danger: #C44536;
+            --danger-light: #FCEEED;
+            --warning: #D4A03C;
+            --warning-light: #FDF6E3;
+            --success: #2D5A4A;
+            --success-light: #E8F2ED;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Fraunces', Georgia, serif;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        /* Login Page */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-accent) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-light) 0%, transparent 70%);
+            top: -200px;
+            right: -200px;
+            opacity: 0.6;
+        }
+
+        .login-container::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--accent-light) 0%, transparent 70%);
+            bottom: -100px;
+            left: -100px;
+            opacity: 0.4;
+        }
+
+        .login-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            padding: 48px;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-logo h1 {
+            font-size: 28px;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+        .login-logo p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: var(--bg-secondary);
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #A33B2E;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 8px 12px;
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .login-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .login-footer p {
+            margin: 0;
+        }
+
+        .login-footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .login-divider span {
+            padding: 0 16px;
+        }
+
+        .demo-accounts {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--bg-accent);
+            border-radius: var(--radius-md);
+            font-size: 13px;
+        }
+
+        .demo-accounts h4 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .demo-accounts p {
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: flex;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 100;
+        }
+
+        .sidebar-logo {
+            margin-bottom: 32px;
+        }
+
+        .sidebar-logo h2 {
+            font-size: 22px;
+            color: var(--accent-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background: var(--accent-light);
+            color: var(--accent-primary);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            background: var(--bg-accent);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: capitalize;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 32px;
+            max-width: calc(100% - 260px);
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+        }
+
+        .page-header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Fraunces', Georgia, serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        /* Projects Table */
+        .projects-section {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .section-header h3 {
+            font-size: 18px;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            position: relative;
+        }
+
+        .search-input input {
+            padding: 10px 16px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            width: 240px;
+            font-family: inherit;
+        }
+
+        .search-input input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .search-input svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .projects-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .projects-table th {
+            text-align: left;
+            padding: 14px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            background: var(--bg-accent);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .projects-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        .projects-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .projects-table tr:hover td {
+            background: var(--bg-primary);
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .client-email {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .status-badge.active {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-badge.pending {
+            background: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .status-badge.completed {
+            background: var(--bg-accent);
+            color: var(--text-secondary);
+        }
+
+        .status-badge.urgent {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        /* Project Type Tags */
+        .project-types {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .type-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .type-tag.language {
+            background: linear-gradient(135deg, #E8F4FD 0%, #D1E9FA 100%);
+            color: #1565C0;
+            border: 1px solid #90CAF9;
+        }
+
+        .type-tag.studyabroad {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            color: #E65100;
+            border: 1px solid #FFCC80;
+        }
+
+        .type-tag svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* Checkbox group for project types */
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--text-muted);
+        }
+
+        .checkbox-item.language.checked {
+            border-color: #1565C0;
+            background: #E8F4FD;
+        }
+
+        .checkbox-item.studyabroad.checked {
+            border-color: #E65100;
+            background: #FFF3E0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent-primary);
+        }
+
+        .checkbox-item .checkbox-label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .checkbox-item .checkbox-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Language Switcher */
+        .lang-switcher {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-accent);
+            padding: 4px;
+            border-radius: var(--radius-md);
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .login-lang-switcher {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            z-index: 10;
+        }
+
+        .sidebar-lang-switcher {
+            margin-bottom: 16px;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .action-btn.delete:hover {
+            background: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalIn 0.3s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--bg-accent);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding: 20px 24px;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-accent);
+        }
+
+        /* Project Detail View */
+        .project-detail {
+            display: none;
+        }
+
+        .project-detail.active {
+            display: block;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+        }
+
+        .detail-main {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .detail-card {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+        }
+
+        .detail-card h4 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .info-value {
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .universities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .university-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: var(--bg-accent);
+            border-radius: var(--radius-md);
+        }
+
+        .university-name {
+            font-weight: 500;
+        }
+
+        .university-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .notes-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 12px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .activity-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .activity-date {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h4 {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--text-primary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .toast.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                max-width: 100%;
+            }
+
+            .mobile-menu-btn {
+                display: block !important;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-filter {
+                width: 100%;
+            }
+
+            .search-input input {
+                width: 100%;
+            }
+
+            .projects-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 200;
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: var(--radius-md);
+            background: var(--bg-secondary);
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Manager-only elements */
+        .manager-only {
+            display: none;
+        }
+
+        body.is-manager .manager-only {
+            display: flex;
+        }
+
+        body.is-manager .manager-only-block {
+            display: block;
+        }
+
+        body.is-manager .manager-only-inline {
+            display: inline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-container" id="loginPage">
+        <div class="lang-switcher login-lang-switcher">
+            <button class="lang-btn active" id="loginLangEn" onclick="switchLanguage('en')">EN</button>
+            <button class="lang-btn" id="loginLangZh" onclick="switchLanguage('zh')">中文</button>
+        </div>
+        <div class="login-card">
+            <div class="login-logo">
+                <h1>ApplyPath</h1>
+                <p>University Application Management</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+            </form>
+            
+            <!-- Registration Form -->
+            <form id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" placeholder="Create a password (min 6 characters)" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirm Password</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+            </form>
+            
+            <div class="login-footer" id="loginFooter">
+                <p><span id="noAccountText">Don't have an account?</span> <a href="#" onclick="showRegisterForm(event)"><span id="registerLink">Register</span></a></p>
+            </div>
+            
+            <div class="login-footer hidden" id="registerFooter">
+                <p><span id="haveAccountText">Already have an account?</span> <a href="#" onclick="showLoginForm(event)"><span id="loginLink">Sign In</span></a></p>
+            </div>
+            
+            <div class="demo-accounts" id="demoAccountsSection">
+                <h4>Demo Accounts</h4>
+                <p><strong>Manager:</strong> manager@applypath.com / password</p>
+                <p><strong>Consultant:</strong> consultant@applypath.com / password</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <h2>ApplyPath</h2>
+            </div>
+            <div class="lang-switcher sidebar-lang-switcher">
+                <button class="lang-btn active" id="sidebarLangEn" onclick="switchLanguage('en')">EN</button>
+                <button class="lang-btn" id="sidebarLangZh" onclick="switchLanguage('zh')">中文</button>
+            </div>
+            <nav class="sidebar-nav">
+                <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                        <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                        <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                    </svg>
+                    Dashboard
+                </a>
+                <a class="nav-item" data-page="projects" onclick="showPage('projects')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    All Projects
+                </a>
+                <a class="nav-item manager-only" data-page="team" onclick="showPage('team')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    Team
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">John Doe</div>
+                        <div class="user-role" id="userRole">Manager</div>
+                    </div>
+                </div>
+                <button class="btn btn-ghost btn-full" style="margin-top: 12px;" onclick="logout()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Sign Out
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div class="page" id="dashboardPage">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                    <div class="page-header-actions manager-only">
+                        <button class="btn btn-primary" onclick="openModal('addProject')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            New Project
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Projects</div>
+                        <div class="stat-value" id="statTotal">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Active</div>
+                        <div class="stat-value" id="statActive">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Pending</div>
+                        <div class="stat-value" id="statPending">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Completed</div>
+                        <div class="stat-value" id="statCompleted">0</div>
+                    </div>
+                </div>
+
+                <div class="projects-section">
+                    <div class="section-header">
+                        <h3>Recent Projects</h3>
+                    </div>
+                    <table class="projects-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Type</th>
+                                <th>Target Schools</th>
+                                <th>Start Date</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentProjectsBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Projects Page -->
+            <div class="page hidden" id="projectsPage">
+                <div class="page-header">
+                    <h1>All Projects</h1>
+                    <div class="page-header-actions manager-only">
+                        <button class="btn btn-primary" onclick="openModal('addProject')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            New Project
+                        </button>
+                    </div>
+                </div>
+
+                <div class="projects-section">
+                    <div class="section-header">
+                        <h3>Project List</h3>
+                        <div class="search-filter">
+                            <div class="search-input">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input type="text" id="searchInput" placeholder="Search clients..." oninput="filterProjects()">
+                            </div>
+                            <select class="filter-select" id="statusFilter" onchange="filterProjects()">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="pending">Pending</option>
+                                <option value="completed">Completed</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                            <select class="filter-select" id="typeFilter" onchange="filterProjects()">
+                                <option value="">All Types</option>
+                                <option value="language">🌐 语言类</option>
+                                <option value="studyabroad">🎓 留学类</option>
+                            </select>
+                            <select class="filter-select manager-only" id="assigneeFilter" onchange="filterProjects()">
+                                <option value="">All Assignees</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table class="projects-table">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Type</th>
+                                <th>Target Schools</th>
+                                <th>Assigned To</th>
+                                <th>Start Date</th>
+                                <th>Deadline</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allProjectsBody">
+                        </tbody>
+                    </table>
+                    <div class="empty-state hidden" id="emptyState">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <h4>No projects found</h4>
+                        <p>Try adjusting your search or filter criteria</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Page (Manager Only) -->
+            <div class="page hidden" id="teamPage">
+                <div class="page-header">
+                    <h1>Team Members</h1>
+                    <div class="page-header-actions">
+                        <button class="btn btn-primary" onclick="openModal('addUser')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Member
+                        </button>
+                    </div>
+                </div>
+
+                <div class="projects-section">
+                    <table class="projects-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Projects</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Project Detail Page -->
+            <div class="project-detail" id="projectDetail">
+                <a class="back-link" onclick="closeProjectDetail()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Projects
+                </a>
+
+                <div class="page-header">
+                    <h1 id="detailClientName">Client Name</h1>
+                    <div class="page-header-actions">
+                        <button class="btn btn-secondary manager-only" onclick="editCurrentProject()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+
+                <div class="detail-grid">
+                    <div class="detail-main">
+                        <div class="detail-card">
+                            <h4>Project Information</h4>
+                            <div class="info-row">
+                                <span class="info-label">Project Type</span>
+                                <span class="info-value" id="detailProjectTypes">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Client Email</span>
+                                <span class="info-value" id="detailEmail">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone</span>
+                                <span class="info-value" id="detailPhone">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Start Date</span>
+                                <span class="info-value" id="detailStartDate">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Deadline</span>
+                                <span class="info-value" id="detailDeadline">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Status</span>
+                                <span class="info-value" id="detailStatus">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Assigned To</span>
+                                <span class="info-value" id="detailAssignee">-</span>
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <h4>Target Universities</h4>
+                            <div class="universities-list" id="detailUniversities">
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
+                            <h4>Notes</h4>
+                            <div class="notes-content" id="detailNotes">No notes available.</div>
+                        </div>
+                    </div>
+
+                    <div class="detail-sidebar">
+                        <div class="detail-card">
+                            <h4>Activity Log</h4>
+                            <div class="activity-list" id="detailActivity">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Project Modal -->
+    <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="projectModalTitle">Add New Project</h3>
+                <button class="modal-close" onclick="closeModal('projectModal')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="projectForm" onsubmit="saveProject(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="projectId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientName">Client Name *</label>
+                            <input type="text" id="clientName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientEmail">Client Email *</label>
+                            <input type="email" id="clientEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="clientPhone">Phone Number</label>
+                            <input type="tel" id="clientPhone">
+                        </div>
+                        <div class="form-group">
+                            <label for="assignedTo">Assigned To</label>
+                            <select id="assignedTo">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Project Type</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item language" id="languageCheckbox">
+                                <input type="checkbox" id="typeLanguage" onchange="updateCheckboxStyle('language')">
+                                <div>
+                                    <div class="checkbox-label">🌐 语言类</div>
+                                    <div class="checkbox-desc">Language Training (TOEFL, IELTS, etc.)</div>
+                                </div>
+                            </label>
+                            <label class="checkbox-item studyabroad" id="studyabroadCheckbox">
+                                <input type="checkbox" id="typeStudyAbroad" onchange="updateCheckboxStyle('studyabroad')">
+                                <div>
+                                    <div class="checkbox-label">🎓 留学类</div>
+                                    <div class="checkbox-desc">Study Abroad Application</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="startDate">Start Date *</label>
+                            <input type="date" id="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="deadline">Deadline *</label>
+                            <input type="date" id="deadline" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="targetUniversities">Target Universities (comma separated)</label>
+                        <input type="text" id="targetUniversities" placeholder="MIT, Stanford, Harvard...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="projectStatus">Status</label>
+                            <select id="projectStatus">
+                                <option value="pending">Pending</option>
+                                <option value="active">Active</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="applicationSeason">Application Season</label>
+                            <select id="applicationSeason">
+                                <option value="Fall 2025">Fall 2025</option>
+                                <option value="Spring 2025">Spring 2025</option>
+                                <option value="Fall 2026">Fall 2026</option>
+                                <option value="Spring 2026">Spring 2026</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="projectNotes">Notes</label>
+                        <textarea id="projectNotes" placeholder="Additional notes about this project..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Project</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Add Team Member</h3>
+                <button class="modal-close" onclick="closeModal('userModal')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUserName">Full Name *</label>
+                            <input type="text" id="newUserName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserEmail">Email *</label>
+                            <input type="email" id="newUserEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="newUserPassword">Password *</label>
+                            <input type="password" id="newUserPassword" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserRole">Role *</label>
+                            <select id="newUserRole" required>
+                                <option value="consultant">Consultant</option>
+                                <option value="manager">Manager</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <script>
+        // =====================
+        // SUPABASE CONFIGURATION
+        // =====================
+        // ⚠️ 请替换为您自己的 Supabase 项目配置
+        // ⚠️ Replace with your own Supabase project configuration
+        const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
+        
+        // 初始化 Supabase 客户端
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // =====================
+        // DATA STORE
+        // =====================
+        let users = [];
+        let projects = [];
+        let currentUser = null;
+        let currentProjectId = null;
+
+        // 加载数据
+        async function loadData() {
+            try {
+                // 获取用户列表
+                const { data: usersData, error: usersError } = await supabase
+                    .from('profiles')
+                    .select('id, name, email, role');
+                
+                if (usersError) throw usersError;
+                users = usersData || [];
+
+                // 获取项目列表（RLS 会自动过滤）
+                const { data: projectsData, error: projectsError } = await supabase
+                    .from('projects')
+                    .select(`
+                        *,
+                        assignee:profiles!assigned_to(id, name)
+                    `)
+                    .order('updated_at', { ascending: false });
+                
+                if (projectsError) throw projectsError;
+                
+                // 转换数据格式
+                projects = (projectsData || []).map(p => ({
+                    id: p.id,
+                    clientName: p.client_name,
+                    clientEmail: p.client_email,
+                    clientPhone: p.client_phone,
+                    startDate: p.start_date,
+                    deadline: p.deadline,
+                    status: p.status,
+                    assignedTo: p.assigned_to,
+                    assigneeName: p.assignee?.name || null,
+                    applicationSeason: p.application_season,
+                    notes: p.notes,
+                    projectTypes: p.project_types || [],
+                    targetUniversities: p.target_universities || [],
+                    createdAt: p.created_at,
+                    updatedAt: p.updated_at
+                }));
+            } catch (err) {
+                console.error('Error loading data:', err);
+            }
+        }
+
+        // 加载项目活动日志
+        async function loadActivities(projectId) {
+            const { data, error } = await supabase
+                .from('activities')
+                .select('description, created_at')
+                .eq('project_id', projectId)
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error loading activities:', error);
+                return [];
+            }
+            
+            return data.map(a => ({
+                text: a.description,
+                date: a.created_at
+            }));
+        }
+
+        // =====================
+        // TRANSLATIONS
+        // =====================
+        const translations = {
+            en: {
+                // Login
+                appName: 'ApplyPath',
+                appTagline: 'University Application Management',
+                emailLabel: 'Email Address',
+                emailPlaceholder: 'Enter your email',
+                passwordLabel: 'Password',
+                passwordPlaceholder: 'Enter your password',
+                signIn: 'Sign In',
+                demoAccounts: 'Demo Accounts',
+                manager: 'Manager',
+                consultant: 'Consultant',
+                
+                // Navigation
+                dashboard: 'Dashboard',
+                allProjects: 'All Projects',
+                team: 'Team',
+                signOut: 'Sign Out',
+                
+                // Dashboard
+                totalProjects: 'Total Projects',
+                active: 'Active',
+                pending: 'Pending',
+                completed: 'Completed',
+                urgent: 'Urgent',
+                recentProjects: 'Recent Projects',
+                newProject: 'New Project',
+                
+                // Table Headers
+                client: 'Client',
+                type: 'Type',
+                targetSchools: 'Target Schools',
+                assignedTo: 'Assigned To',
+                startDate: 'Start Date',
+                deadline: 'Deadline',
+                status: 'Status',
+                actions: 'Actions',
+                
+                // Project Types
+                language: 'Language',
+                studyAbroad: 'Study Abroad',
+                languageDesc: 'Language Training (TOEFL, IELTS, etc.)',
+                studyAbroadDesc: 'Study Abroad Application',
+                allTypes: 'All Types',
+                
+                // Filters
+                projectList: 'Project List',
+                searchClients: 'Search clients...',
+                allStatus: 'All Status',
+                allAssignees: 'All Assignees',
+                
+                // Team Page
+                teamMembers: 'Team Members',
+                addMember: 'Add Member',
+                name: 'Name',
+                email: 'Email',
+                role: 'Role',
+                projects: 'Projects',
+                you: 'You',
+                
+                // Project Detail
+                backToProjects: 'Back to Projects',
+                edit: 'Edit',
+                projectInfo: 'Project Information',
+                projectType: 'Project Type',
+                clientEmail: 'Client Email',
+                phone: 'Phone',
+                targetUniversities: 'Target Universities',
+                notes: 'Notes',
+                noNotes: 'No notes available.',
+                activityLog: 'Activity Log',
+                noActivity: 'No activity yet.',
+                noUniversities: 'No target universities specified.',
+                
+                // Modal - Project
+                addNewProject: 'Add New Project',
+                editProject: 'Edit Project',
+                clientName: 'Client Name',
+                phoneNumber: 'Phone Number',
+                targetUniversitiesLabel: 'Target Universities (comma separated)',
+                targetUniversitiesPlaceholder: 'MIT, Stanford, Harvard...',
+                applicationSeason: 'Application Season',
+                notesLabel: 'Notes',
+                notesPlaceholder: 'Additional notes about this project...',
+                cancel: 'Cancel',
+                saveProject: 'Save Project',
+                
+                // Modal - User
+                addTeamMember: 'Add Team Member',
+                fullName: 'Full Name',
+                password: 'Password',
+                
+                // Messages
+                noProjectsYet: 'No projects yet',
+                noProjectsFound: 'No projects found',
+                tryAdjusting: 'Try adjusting your search or filter criteria',
+                invalidLogin: 'Invalid email or password',
+                projectCreated: 'Project created successfully',
+                projectUpdated: 'Project updated successfully',
+                projectDeleted: 'Project deleted successfully',
+                memberAdded: 'Team member added successfully',
+                memberRemoved: 'Team member removed',
+                confirmDelete: 'Are you sure you want to delete this project? This action cannot be undone.',
+                confirmRemove: 'Are you sure you want to remove this team member?',
+                duplicateEmail: 'A user with this email already exists.',
+                unassigned: 'Unassigned',
+                
+                // Activity
+                activityCreated: 'Project created',
+                activityUpdated: 'Project updated',
+                
+                // Registration
+                createAccount: 'Create Account',
+                register: 'Register',
+                confirmPassword: 'Confirm Password',
+                alreadyHaveAccount: 'Already have an account?',
+                noAccount: "Don't have an account?",
+                registerSuccess: 'Account created successfully! Please login.',
+                passwordMismatch: 'Passwords do not match',
+                emailExists: 'An account with this email already exists',
+                allFieldsRequired: 'All fields are required',
+                passwordTooShort: 'Password must be at least 6 characters'
+            },
+            zh: {
+                // Login
+                appName: 'ApplyPath',
+                appTagline: '留学申请项目管理系统',
+                emailLabel: '邮箱地址',
+                emailPlaceholder: '请输入邮箱',
+                passwordLabel: '密码',
+                passwordPlaceholder: '请输入密码',
+                signIn: '登录',
+                demoAccounts: '演示账号',
+                manager: '管理员',
+                consultant: '顾问',
+                
+                // Navigation
+                dashboard: '仪表盘',
+                allProjects: '全部项目',
+                team: '团队',
+                signOut: '退出登录',
+                
+                // Dashboard
+                totalProjects: '项目总数',
+                active: '进行中',
+                pending: '待处理',
+                completed: '已完成',
+                urgent: '紧急',
+                recentProjects: '最近项目',
+                newProject: '新建项目',
+                
+                // Table Headers
+                client: '客户',
+                type: '类型',
+                targetSchools: '目标学校',
+                assignedTo: '负责人',
+                startDate: '开始日期',
+                deadline: '截止日期',
+                status: '状态',
+                actions: '操作',
+                
+                // Project Types
+                language: '语言',
+                studyAbroad: '留学',
+                languageDesc: '语言培训 (托福、雅思等)',
+                studyAbroadDesc: '留学申请服务',
+                allTypes: '全部类型',
+                
+                // Filters
+                projectList: '项目列表',
+                searchClients: '搜索客户...',
+                allStatus: '全部状态',
+                allAssignees: '全部负责人',
+                
+                // Team Page
+                teamMembers: '团队成员',
+                addMember: '添加成员',
+                name: '姓名',
+                email: '邮箱',
+                role: '角色',
+                projects: '项目数',
+                you: '我',
+                
+                // Project Detail
+                backToProjects: '返回项目列表',
+                edit: '编辑',
+                projectInfo: '项目信息',
+                projectType: '项目类型',
+                clientEmail: '客户邮箱',
+                phone: '电话',
+                targetUniversities: '目标院校',
+                notes: '备注',
+                noNotes: '暂无备注',
+                activityLog: '活动记录',
+                noActivity: '暂无活动记录',
+                noUniversities: '暂未指定目标院校',
+                
+                // Modal - Project
+                addNewProject: '新建项目',
+                editProject: '编辑项目',
+                clientName: '客户姓名',
+                phoneNumber: '电话号码',
+                targetUniversitiesLabel: '目标院校（用逗号分隔）',
+                targetUniversitiesPlaceholder: 'MIT, 斯坦福, 哈佛...',
+                applicationSeason: '申请季',
+                notesLabel: '备注',
+                notesPlaceholder: '关于此项目的其他备注...',
+                cancel: '取消',
+                saveProject: '保存项目',
+                
+                // Modal - User
+                addTeamMember: '添加团队成员',
+                fullName: '姓名',
+                password: '密码',
+                
+                // Messages
+                noProjectsYet: '暂无项目',
+                noProjectsFound: '未找到项目',
+                tryAdjusting: '请尝试调整搜索或筛选条件',
+                invalidLogin: '邮箱或密码错误',
+                projectCreated: '项目创建成功',
+                projectUpdated: '项目更新成功',
+                projectDeleted: '项目删除成功',
+                memberAdded: '成员添加成功',
+                memberRemoved: '成员已移除',
+                confirmDelete: '确定要删除此项目吗？此操作无法撤销。',
+                confirmRemove: '确定要移除此团队成员吗？',
+                duplicateEmail: '该邮箱已被使用',
+                unassigned: '未分配',
+                
+                // Activity
+                activityCreated: '项目创建',
+                activityUpdated: '项目更新',
+                
+                // Registration
+                createAccount: '创建账户',
+                register: '注册',
+                confirmPassword: '确认密码',
+                alreadyHaveAccount: '已有账户？',
+                noAccount: '还没有账户？',
+                registerSuccess: '账户创建成功！请登录。',
+                passwordMismatch: '两次输入的密码不一致',
+                emailExists: '该邮箱已被注册',
+                allFieldsRequired: '请填写所有必填项',
+                passwordTooShort: '密码长度至少6位'
+            }
+        };
+
+        let currentLang = localStorage.getItem('applypath_lang') || 'en';
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('applypath_lang', lang);
+            updateLangButtons();
+            updateAllText();
+            updateUI();
+        }
+
+        function updateLangButtons() {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.id.includes('En') && currentLang === 'en') || 
+                    (btn.id.includes('Zh') && currentLang === 'zh')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function updateAllText() {
+            // Login page
+            document.querySelector('.login-logo h1').textContent = t('appName');
+            document.querySelector('.login-logo p').textContent = t('appTagline');
+            document.querySelector('label[for="loginEmail"]').textContent = t('emailLabel');
+            document.getElementById('loginEmail').placeholder = t('emailPlaceholder');
+            document.querySelector('label[for="loginPassword"]').textContent = t('passwordLabel');
+            document.getElementById('loginPassword').placeholder = t('passwordPlaceholder');
+            document.querySelector('#loginForm button[type="submit"]').textContent = t('signIn');
+            document.querySelector('.demo-accounts h4').textContent = t('demoAccounts');
+            document.querySelectorAll('.demo-accounts p')[0].innerHTML = `<strong>${t('manager')}:</strong> manager@applypath.com / password`;
+            document.querySelectorAll('.demo-accounts p')[1].innerHTML = `<strong>${t('consultant')}:</strong> consultant@applypath.com / password`;
+            
+            // Update auth form texts (login/register toggle)
+            updateAuthFormText();
+            
+            // Sidebar
+            document.querySelector('.sidebar-logo h2').textContent = t('appName');
+            document.querySelector('[data-page="dashboard"]').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+                ${t('dashboard')}`;
+            document.querySelector('[data-page="projects"]').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                ${t('allProjects')}`;
+            document.querySelector('[data-page="team"]').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                ${t('team')}`;
+            document.querySelector('.sidebar-footer .btn-ghost').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                ${t('signOut')}`;
+            
+            // Dashboard page
+            document.querySelector('#dashboardPage .page-header h1').textContent = t('dashboard');
+            document.querySelectorAll('.stat-label')[0].textContent = t('totalProjects');
+            document.querySelectorAll('.stat-label')[1].textContent = t('active');
+            document.querySelectorAll('.stat-label')[2].textContent = t('pending');
+            document.querySelectorAll('.stat-label')[3].textContent = t('completed');
+            document.querySelector('#dashboardPage .section-header h3').textContent = t('recentProjects');
+            
+            // Update new project buttons
+            document.querySelectorAll('.page-header-actions .btn-primary').forEach(btn => {
+                if (btn.closest('#dashboardPage') || btn.closest('#projectsPage')) {
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        ${t('newProject')}`;
+                }
+            });
+            
+            // Projects page
+            document.querySelector('#projectsPage .page-header h1').textContent = t('allProjects');
+            document.querySelector('#projectsPage .section-header h3').textContent = t('projectList');
+            document.getElementById('searchInput').placeholder = t('searchClients');
+            
+            // Update filter dropdowns
+            const statusFilter = document.getElementById('statusFilter');
+            statusFilter.innerHTML = `
+                <option value="">${t('allStatus')}</option>
+                <option value="active">${t('active')}</option>
+                <option value="pending">${t('pending')}</option>
+                <option value="completed">${t('completed')}</option>
+                <option value="urgent">${t('urgent')}</option>`;
+            
+            const typeFilter = document.getElementById('typeFilter');
+            typeFilter.innerHTML = `
+                <option value="">${t('allTypes')}</option>
+                <option value="language">🌐 ${t('language')}</option>
+                <option value="studyabroad">🎓 ${t('studyAbroad')}</option>`;
+            
+            // Empty state
+            document.querySelector('#emptyState h4').textContent = t('noProjectsFound');
+            document.querySelector('#emptyState p').textContent = t('tryAdjusting');
+            
+            // Team page
+            document.querySelector('#teamPage .page-header h1').textContent = t('teamMembers');
+            document.querySelector('#teamPage .btn-primary').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                ${t('addMember')}`;
+            
+            // Project detail
+            document.querySelector('.back-link').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                ${t('backToProjects')}`;
+            document.querySelector('#projectDetail .btn-secondary').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                ${t('edit')}`;
+            
+            // Project modal
+            document.querySelector('label[for="clientName"]').textContent = t('clientName') + ' *';
+            document.querySelector('label[for="clientEmail"]').textContent = t('clientEmail') + ' *';
+            document.querySelector('label[for="clientPhone"]').textContent = t('phoneNumber');
+            document.querySelector('label[for="assignedTo"]').textContent = t('assignedTo');
+            document.querySelector('label[for="startDate"]').textContent = t('startDate') + ' *';
+            document.querySelector('label[for="deadline"]').textContent = t('deadline') + ' *';
+            document.querySelector('label[for="targetUniversities"]').textContent = t('targetUniversitiesLabel');
+            document.getElementById('targetUniversities').placeholder = t('targetUniversitiesPlaceholder');
+            document.querySelector('label[for="projectStatus"]').textContent = t('status');
+            document.querySelector('label[for="applicationSeason"]').textContent = t('applicationSeason');
+            document.querySelector('label[for="projectNotes"]').textContent = t('notesLabel');
+            document.getElementById('projectNotes').placeholder = t('notesPlaceholder');
+            document.querySelector('#projectModal .modal-footer .btn-secondary').textContent = t('cancel');
+            document.querySelector('#projectModal .modal-footer .btn-primary').textContent = t('saveProject');
+            
+            // Project type checkboxes
+            document.querySelector('#languageCheckbox .checkbox-label').textContent = '🌐 ' + t('language');
+            document.querySelector('#languageCheckbox .checkbox-desc').textContent = t('languageDesc');
+            document.querySelector('#studyabroadCheckbox .checkbox-label').textContent = '🎓 ' + t('studyAbroad');
+            document.querySelector('#studyabroadCheckbox .checkbox-desc').textContent = t('studyAbroadDesc');
+            
+            // User modal
+            document.querySelector('#userModal .modal-header h3').textContent = t('addTeamMember');
+            document.querySelector('label[for="newUserName"]').textContent = t('fullName') + ' *';
+            document.querySelector('label[for="newUserEmail"]').textContent = t('email') + ' *';
+            document.querySelector('label[for="newUserPassword"]').textContent = t('password') + ' *';
+            document.querySelector('label[for="newUserRole"]').textContent = t('role') + ' *';
+            document.querySelector('#userModal .modal-footer .btn-secondary').textContent = t('cancel');
+            document.querySelector('#userModal .modal-footer .btn-primary').textContent = t('addMember');
+            
+            // Update role options
+            const roleSelect = document.getElementById('newUserRole');
+            roleSelect.innerHTML = `
+                <option value="consultant">${t('consultant')}</option>
+                <option value="manager">${t('manager')}</option>`;
+            
+            // Update table headers
+            updateTableHeaders();
+        }
+
+        function updateTableHeaders() {
+            // Recent projects table
+            const recentTable = document.querySelector('#dashboardPage .projects-table thead tr');
+            if (recentTable) {
+                recentTable.innerHTML = `
+                    <th>${t('client')}</th>
+                    <th>${t('type')}</th>
+                    <th>${t('targetSchools')}</th>
+                    <th>${t('startDate')}</th>
+                    <th>${t('deadline')}</th>
+                    <th>${t('status')}</th>
+                    <th>${t('actions')}</th>`;
+            }
+            
+            // All projects table
+            const allTable = document.querySelector('#projectsPage .projects-table thead tr');
+            if (allTable) {
+                allTable.innerHTML = `
+                    <th>${t('client')}</th>
+                    <th>${t('type')}</th>
+                    <th>${t('targetSchools')}</th>
+                    <th>${t('assignedTo')}</th>
+                    <th>${t('startDate')}</th>
+                    <th>${t('deadline')}</th>
+                    <th>${t('status')}</th>
+                    <th>${t('actions')}</th>`;
+            }
+            
+            // Team table
+            const teamTable = document.querySelector('#teamPage .projects-table thead tr');
+            if (teamTable) {
+                teamTable.innerHTML = `
+                    <th>${t('name')}</th>
+                    <th>${t('email')}</th>
+                    <th>${t('role')}</th>
+                    <th>${t('projects')}</th>
+                    <th>${t('actions')}</th>`;
+            }
+        }
+
+        // =====================
+        // AUTH (Supabase)
+        // =====================
+        async function login(email, password) {
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                // 获取用户资料
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', data.user.id)
+                    .single();
+                
+                if (profileError) throw profileError;
+                
+                currentUser = profile;
+                return { success: true };
+            } catch (err) {
+                console.error('Login error:', err);
+                return { success: false, error: err.message };
+            }
+        }
+
+        async function logout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboard').classList.remove('active');
+            document.body.classList.remove('is-manager');
+            showLoginForm();
+        }
+
+        async function register(name, email, password) {
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { name }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                return { success: true };
+            } catch (err) {
+                console.error('Register error:', err);
+                return { success: false, error: err.message };
+            }
+        }
+
+        function showRegisterForm(e) {
+            if (e) e.preventDefault();
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginFooter').classList.add('hidden');
+            document.getElementById('registerFooter').classList.remove('hidden');
+            document.getElementById('demoAccountsSection').classList.add('hidden');
+            updateAuthFormText();
+        }
+
+        function showLoginForm(e) {
+            if (e) e.preventDefault();
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginFooter').classList.remove('hidden');
+            document.getElementById('registerFooter').classList.add('hidden');
+            document.getElementById('demoAccountsSection').classList.remove('hidden');
+            updateAuthFormText();
+        }
+
+        function updateAuthFormText() {
+            // Registration form labels
+            document.querySelector('label[for="registerName"]').textContent = t('fullName');
+            document.querySelector('label[for="registerEmail"]').textContent = t('emailLabel');
+            document.querySelector('label[for="registerPassword"]').textContent = t('passwordLabel');
+            document.querySelector('label[for="registerConfirmPassword"]').textContent = t('confirmPassword');
+            document.getElementById('registerName').placeholder = currentLang === 'zh' ? '请输入姓名' : 'Enter your full name';
+            document.getElementById('registerEmail').placeholder = t('emailPlaceholder');
+            document.getElementById('registerPassword').placeholder = currentLang === 'zh' ? '创建密码（至少6位）' : 'Create a password (min 6 characters)';
+            document.getElementById('registerConfirmPassword').placeholder = currentLang === 'zh' ? '再次输入密码' : 'Confirm your password';
+            document.querySelector('#registerForm button[type="submit"]').textContent = t('createAccount');
+            
+            // Footer texts
+            document.getElementById('noAccountText').textContent = t('noAccount');
+            document.getElementById('registerLink').textContent = t('register');
+            document.getElementById('haveAccountText').textContent = t('alreadyHaveAccount');
+            document.getElementById('loginLink').textContent = t('signIn');
+        }
+
+        function isManager() {
+            return currentUser && currentUser.role === 'manager';
+        }
+
+        // =====================
+        // UI UPDATES (Supabase)
+        // =====================
+        async function updateUI() {
+            if (!currentUser) return;
+
+            // Load data from Supabase
+            await loadData();
+
+            // Update user info
+            document.getElementById('userName').textContent = currentUser.name;
+            document.getElementById('userRole').textContent = currentUser.role;
+            document.getElementById('userAvatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('');
+
+            // Manager-specific UI
+            if (isManager()) {
+                document.body.classList.add('is-manager');
+            } else {
+                document.body.classList.remove('is-manager');
+            }
+
+            // Update stats from data
+            const stats = {
+                total: projects.length,
+                active: projects.filter(p => p.status === 'active').length,
+                pending: projects.filter(p => p.status === 'pending').length,
+                completed: projects.filter(p => p.status === 'completed').length
+            };
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statActive').textContent = stats.active;
+            document.getElementById('statPending').textContent = stats.pending;
+            document.getElementById('statCompleted').textContent = stats.completed;
+
+            // Populate assignee dropdowns
+            populateAssigneeDropdowns();
+
+            // Render tables
+            renderRecentProjects();
+            renderAllProjects();
+            if (isManager()) {
+                renderTeam();
+            }
+        }
+
+        function getVisibleProjects() {
+            // Projects are already filtered by RLS
+            return projects;
+        }
+
+        function populateAssigneeDropdowns() {
+            const assignedToSelect = document.getElementById('assignedTo');
+            const assigneeFilter = document.getElementById('assigneeFilter');
+            
+            assignedToSelect.innerHTML = `<option value="">${t('unassigned')}</option>`;
+            assigneeFilter.innerHTML = `<option value="">${t('allAssignees')}</option>`;
+            
+            users.forEach(user => {
+                assignedToSelect.innerHTML += `<option value="${user.id}">${user.name}</option>`;
+                assigneeFilter.innerHTML += `<option value="${user.id}">${user.name}</option>`;
+            });
+        }
+
+        function getUserName(userId) {
+            const user = users.find(u => u.id === userId);
+            return user ? user.name : t('unassigned');
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function renderTypeTags(types) {
+            if (!types || types.length === 0) return '<span style="color: var(--text-muted);">-</span>';
+            return `<div class="project-types">
+                ${types.includes('language') ? `<span class="type-tag language">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    ${t('language')}
+                </span>` : ''}
+                ${types.includes('studyabroad') ? `<span class="type-tag studyabroad">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                        <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                    </svg>
+                    ${t('studyAbroad')}
+                </span>` : ''}
+            </div>`;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'active': t('active'),
+                'pending': t('pending'),
+                'completed': t('completed'),
+                'urgent': t('urgent')
+            };
+            return statusMap[status] || status;
+        }
+
+        function getRoleText(role) {
+            const roleMap = {
+                'manager': t('manager'),
+                'consultant': t('consultant')
+            };
+            return roleMap[role] || role;
+        }
+
+        function updateCheckboxStyle(type) {
+            const checkbox = document.getElementById(type === 'language' ? 'typeLanguage' : 'typeStudyAbroad');
+            const container = document.getElementById(type === 'language' ? 'languageCheckbox' : 'studyabroadCheckbox');
+            if (checkbox.checked) {
+                container.classList.add('checked');
+            } else {
+                container.classList.remove('checked');
+            }
+        }
+
+        function renderRecentProjects() {
+            const tbody = document.getElementById('recentProjectsBody');
+            const visibleProjects = getVisibleProjects().slice(0, 5);
+            
+            if (visibleProjects.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">${t('noProjectsYet')}</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = visibleProjects.map(project => `
+                <tr>
+                    <td>
+                        <div class="client-name">${project.clientName}</div>
+                        <div class="client-email">${project.clientEmail}</div>
+                    </td>
+                    <td>${renderTypeTags(project.projectTypes)}</td>
+                    <td>${project.targetUniversities.slice(0, 2).join(', ')}${project.targetUniversities.length > 2 ? '...' : ''}</td>
+                    <td>${formatDate(project.startDate)}</td>
+                    <td>${formatDate(project.deadline)}</td>
+                    <td><span class="status-badge ${project.status}">${getStatusText(project.status)}</span></td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="action-btn" onclick="viewProject(${project.id})" title="View">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                            ${isManager() ? `
+                            <button class="action-btn" onclick="editProject(${project.id})" title="Edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteProject(${project.id})" title="Delete">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAllProjects() {
+            const tbody = document.getElementById('allProjectsBody');
+            const emptyState = document.getElementById('emptyState');
+            let filteredProjects = getVisibleProjects();
+
+            // Apply filters
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+            const assigneeFilter = document.getElementById('assigneeFilter').value;
+
+            if (searchTerm) {
+                filteredProjects = filteredProjects.filter(p => 
+                    p.clientName.toLowerCase().includes(searchTerm) ||
+                    p.clientEmail.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            if (statusFilter) {
+                filteredProjects = filteredProjects.filter(p => p.status === statusFilter);
+            }
+
+            if (typeFilter) {
+                filteredProjects = filteredProjects.filter(p => p.projectTypes && p.projectTypes.includes(typeFilter));
+            }
+
+            if (assigneeFilter) {
+                filteredProjects = filteredProjects.filter(p => p.assignedTo === parseInt(assigneeFilter));
+            }
+
+            if (filteredProjects.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filteredProjects.map(project => `
+                <tr>
+                    <td>
+                        <div class="client-name">${project.clientName}</div>
+                        <div class="client-email">${project.clientEmail}</div>
+                    </td>
+                    <td>${renderTypeTags(project.projectTypes)}</td>
+                    <td>${project.targetUniversities.slice(0, 2).join(', ')}${project.targetUniversities.length > 2 ? ' +' + (project.targetUniversities.length - 2) : ''}</td>
+                    <td>${getUserName(project.assignedTo)}</td>
+                    <td>${formatDate(project.startDate)}</td>
+                    <td>${formatDate(project.deadline)}</td>
+                    <td><span class="status-badge ${project.status}">${getStatusText(project.status)}</span></td>
+                    <td>
+                        <div class="actions-cell">
+                            <button class="action-btn" onclick="viewProject(${project.id})" title="View">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                            ${isManager() ? `
+                            <button class="action-btn" onclick="editProject(${project.id})" title="Edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="action-btn delete" onclick="deleteProject(${project.id})" title="Delete">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderTeam() {
+            const tbody = document.getElementById('teamBody');
+            
+            tbody.innerHTML = users.map(user => {
+                const userProjectCount = projects.filter(p => p.assignedTo === user.id).length;
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="user-avatar" style="width: 36px; height: 36px; font-size: 12px;">${user.name.split(' ').map(n => n[0]).join('')}</div>
+                                <span class="client-name">${user.name}</span>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td><span class="status-badge ${user.role === 'manager' ? 'active' : 'pending'}">${getRoleText(user.role)}</span></td>
+                        <td>${userProjectCount}</td>
+                        <td>
+                            <div class="actions-cell">
+                                ${user.id !== currentUser.id ? `
+                                <button class="action-btn delete" onclick="deleteUser(${user.id})" title="Remove">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
+                                ` : `<span style="color: var(--text-muted); font-size: 12px;">${t('you')}</span>`}
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterProjects() {
+            renderAllProjects();
+        }
+
+        // =====================
+        // PROJECT CRUD
+        // =====================
+        async function viewProject(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+
+            currentProjectId = id;
+
+            document.getElementById('detailClientName').textContent = project.clientName;
+            document.getElementById('detailEmail').textContent = project.clientEmail;
+            document.getElementById('detailPhone').textContent = project.clientPhone || '-';
+            document.getElementById('detailStartDate').textContent = formatDate(project.startDate);
+            document.getElementById('detailDeadline').textContent = formatDate(project.deadline);
+            document.getElementById('detailStatus').innerHTML = `<span class="status-badge ${project.status}">${getStatusText(project.status)}</span>`;
+            document.getElementById('detailAssignee').textContent = getUserName(project.assignedTo);
+            document.getElementById('detailProjectTypes').innerHTML = renderTypeTags(project.projectTypes);
+            document.getElementById('detailNotes').textContent = project.notes || t('noNotes');
+
+            // Update detail card headers
+            document.querySelectorAll('.detail-card h4')[0].textContent = t('projectInfo');
+            document.querySelectorAll('.detail-card h4')[1].textContent = t('targetUniversities');
+            document.querySelectorAll('.detail-card h4')[2].textContent = t('notes');
+            document.querySelectorAll('.detail-card h4')[3].textContent = t('activityLog');
+            
+            // Update info labels
+            const infoLabels = document.querySelectorAll('.detail-main .info-label');
+            if (infoLabels.length >= 6) {
+                infoLabels[0].textContent = t('projectType');
+                infoLabels[1].textContent = t('clientEmail');
+                infoLabels[2].textContent = t('phone');
+                infoLabels[3].textContent = t('startDate');
+                infoLabels[4].textContent = t('deadline');
+                infoLabels[5].textContent = t('status');
+                infoLabels[6].textContent = t('assignedTo');
+            }
+
+            // Universities
+            const uniContainer = document.getElementById('detailUniversities');
+            if (!project.targetUniversities || project.targetUniversities.length === 0) {
+                uniContainer.innerHTML = `<p style="color: var(--text-muted);">${t('noUniversities')}</p>`;
+            } else {
+                uniContainer.innerHTML = project.targetUniversities.map(uni => `
+                    <div class="university-item">
+                        <span class="university-name">${uni}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Activities - load from Supabase
+            const activityContainer = document.getElementById('detailActivity');
+            activityContainer.innerHTML = '<p style="color: var(--text-muted);">Loading...</p>';
+            
+            const activities = await loadActivities(id);
+            if (!activities || activities.length === 0) {
+                activityContainer.innerHTML = `<p style="color: var(--text-muted);">${t('noActivity')}</p>`;
+            } else {
+                activityContainer.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">${activity.text}</div>
+                            <div class="activity-date">${formatDate(activity.date)}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Show detail view
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('projectDetail').classList.add('active');
+        }
+
+        function closeProjectDetail() {
+            document.getElementById('projectDetail').classList.remove('active');
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('dashboardPage').classList.remove('hidden');
+            currentProjectId = null;
+        }
+
+        function editProject(id) {
+            const project = projects.find(p => p.id === id);
+            if (!project) return;
+
+            document.getElementById('projectModalTitle').textContent = 'Edit Project';
+            document.getElementById('projectId').value = project.id;
+            document.getElementById('clientName').value = project.clientName;
+            document.getElementById('clientEmail').value = project.clientEmail;
+            document.getElementById('clientPhone').value = project.clientPhone || '';
+            document.getElementById('assignedTo').value = project.assignedTo || '';
+            document.getElementById('startDate').value = project.startDate;
+            document.getElementById('deadline').value = project.deadline;
+            document.getElementById('targetUniversities').value = project.targetUniversities.join(', ');
+            document.getElementById('projectStatus').value = project.status;
+            document.getElementById('applicationSeason').value = project.applicationSeason || 'Fall 2025';
+            document.getElementById('projectNotes').value = project.notes || '';
+            
+            // Set project types
+            const types = project.projectTypes || [];
+            document.getElementById('typeLanguage').checked = types.includes('language');
+            document.getElementById('typeStudyAbroad').checked = types.includes('studyabroad');
+            updateCheckboxStyle('language');
+            updateCheckboxStyle('studyabroad');
+
+            openModal('projectModal');
+        }
+
+        function editCurrentProject() {
+            if (currentProjectId) {
+                editProject(currentProjectId);
+            }
+        }
+
+        async function deleteProject(id) {
+            if (!confirm(t('confirmDelete'))) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('projects')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                await updateUI();
+                showToast(t('projectDeleted'));
+                
+                if (currentProjectId === id) {
+                    closeProjectDetail();
+                }
+            } catch (err) {
+                console.error('Delete project error:', err);
+                alert(err.message);
+            }
+        }
+
+        async function saveProject(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('projectId').value;
+            
+            // Get project types
+            const projectTypes = [];
+            if (document.getElementById('typeLanguage').checked) projectTypes.push('language');
+            if (document.getElementById('typeStudyAbroad').checked) projectTypes.push('studyabroad');
+            
+            const projectData = {
+                client_name: document.getElementById('clientName').value,
+                client_email: document.getElementById('clientEmail').value,
+                client_phone: document.getElementById('clientPhone').value,
+                assigned_to: document.getElementById('assignedTo').value || null,
+                start_date: document.getElementById('startDate').value,
+                deadline: document.getElementById('deadline').value,
+                project_types: projectTypes,
+                target_universities: document.getElementById('targetUniversities').value.split(',').map(u => u.trim()).filter(u => u),
+                status: document.getElementById('projectStatus').value,
+                application_season: document.getElementById('applicationSeason').value,
+                notes: document.getElementById('projectNotes').value
+            };
+
+            try {
+                if (id) {
+                    // Edit existing
+                    const { error } = await supabase
+                        .from('projects')
+                        .update(projectData)
+                        .eq('id', id);
+                    
+                    if (error) throw error;
+                    
+                    // Add activity
+                    await supabase
+                        .from('activities')
+                        .insert({ project_id: id, description: t('activityUpdated') });
+                    
+                    showToast(t('projectUpdated'));
+                } else {
+                    // Add new
+                    const { data, error } = await supabase
+                        .from('projects')
+                        .insert(projectData)
+                        .select()
+                        .single();
+                    
+                    if (error) throw error;
+                    
+                    // Add activity
+                    await supabase
+                        .from('activities')
+                        .insert({ project_id: data.id, description: t('activityCreated') });
+                    
+                    showToast(t('projectCreated'));
+                }
+
+                await updateUI();
+                closeModal('projectModal');
+                
+                // Refresh detail view if open
+                if (currentProjectId && id && parseInt(id) === currentProjectId) {
+                    await viewProject(currentProjectId);
+                }
+            } catch (err) {
+                console.error('Save project error:', err);
+                alert(err.message);
+            }
+        }
+
+        // =====================
+        // USER CRUD
+        // =====================
+        async function saveUser(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('newUserName').value;
+            const email = document.getElementById('newUserEmail').value;
+            const password = document.getElementById('newUserPassword').value;
+            const role = document.getElementById('newUserRole').value;
+
+            try {
+                // Create user via Supabase Auth
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        data: { name }
+                    }
+                });
+                
+                if (error) throw error;
+                
+                // Update role if manager
+                if (role === 'manager' && data.user) {
+                    await supabase
+                        .from('profiles')
+                        .update({ role: 'manager' })
+                        .eq('id', data.user.id);
+                }
+                
+                await updateUI();
+                closeModal('userModal');
+                showToast(t('memberAdded'));
+                document.getElementById('userForm').reset();
+            } catch (err) {
+                console.error('Save user error:', err);
+                alert(err.message);
+            }
+        }
+
+        async function deleteUser(id) {
+            if (!confirm(t('confirmRemove'))) return;
+            
+            try {
+                // Note: Deleting users requires admin privileges
+                // In production, you'd use a server function
+                // For now, we just unassign their projects
+                const { error } = await supabase
+                    .from('projects')
+                    .update({ assigned_to: null })
+                    .eq('assigned_to', id);
+                
+                if (error) throw error;
+                
+                // Update profile to mark as inactive (optional)
+                await supabase
+                    .from('profiles')
+                    .delete()
+                    .eq('id', id);
+                
+                await updateUI();
+                showToast(t('memberRemoved'));
+            } catch (err) {
+                console.error('Delete user error:', err);
+                alert(err.message);
+            }
+        }
+
+        // =====================
+        // MODALS
+        // =====================
+        function openModal(type) {
+            if (type === 'addProject') {
+                document.getElementById('projectModalTitle').textContent = 'Add New Project';
+                document.getElementById('projectForm').reset();
+                document.getElementById('projectId').value = '';
+                document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+                // Reset checkboxes
+                document.getElementById('typeLanguage').checked = false;
+                document.getElementById('typeStudyAbroad').checked = false;
+                document.getElementById('languageCheckbox').classList.remove('checked');
+                document.getElementById('studyabroadCheckbox').classList.remove('checked');
+                document.getElementById('projectModal').classList.add('active');
+            } else if (type === 'addUser') {
+                document.getElementById('userForm').reset();
+                document.getElementById('userModal').classList.add('active');
+            } else if (type === 'projectModal') {
+                document.getElementById('projectModal').classList.add('active');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // =====================
+        // NAVIGATION
+        // =====================
+        function showPage(pageName) {
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === pageName) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Show page
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.getElementById('projectDetail').classList.remove('active');
+            
+            if (pageName === 'dashboard') {
+                document.getElementById('dashboardPage').classList.remove('hidden');
+            } else if (pageName === 'projects') {
+                document.getElementById('projectsPage').classList.remove('hidden');
+            } else if (pageName === 'team' && isManager()) {
+                document.getElementById('teamPage').classList.remove('hidden');
+            }
+
+            // Close mobile menu
+            document.getElementById('sidebar').classList.remove('mobile-open');
+        }
+
+        // =====================
+        // TOAST
+        // =====================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        // =====================
+        // INIT
+        // =====================
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const result = await login(email, password);
+            if (result.success) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').classList.add('active');
+                updateAllText();
+                await updateUI();
+            } else {
+                alert(result.error || t('invalidLogin'));
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert(t('allFieldsRequired'));
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert(t('passwordTooShort'));
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert(t('passwordMismatch'));
+                return;
+            }
+            
+            const result = await register(name, email, password);
+            if (result.success) {
+                alert(t('registerSuccess'));
+                // Clear form and switch to login
+                document.getElementById('registerForm').reset();
+                showLoginForm();
+                // Pre-fill email for convenience
+                document.getElementById('loginEmail').value = email;
+            } else {
+                alert(result.error || t('emailExists'));
+            }
+        });
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+        });
+
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Check for existing Supabase session
+        (async function init() {
+            updateLangButtons();
+            updateAllText();
+            
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session) {
+                // Get user profile
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (profile && !error) {
+                    currentUser = profile;
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('dashboard').classList.add('active');
+                    await updateUI();
+                } else {
+                    showLoginForm();
+                }
+            } else {
+                showLoginForm();
+            }
+            
+            // Listen for auth changes
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_OUT') {
+                    currentUser = null;
+                    document.getElementById('loginPage').style.display = 'flex';
+                    document.getElementById('dashboard').classList.remove('active');
+                    document.body.classList.remove('is-manager');
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

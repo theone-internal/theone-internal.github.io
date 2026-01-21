@@ -229,6 +229,10 @@
             color: var(--text-muted);
         }
 
+        .login-footer p {
+            margin: 0;
+        }
+
         .login-footer a {
             color: var(--accent-primary);
             text-decoration: none;
@@ -237,6 +241,26 @@
 
         .login-footer a:hover {
             text-decoration: underline;
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 24px 0;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        .login-divider span {
+            padding: 0 16px;
         }
 
         .demo-accounts {
@@ -654,6 +678,48 @@
             color: var(--text-muted);
         }
 
+        /* Language Switcher */
+        .lang-switcher {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-accent);
+            padding: 4px;
+            border-radius: var(--radius-md);
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--bg-secondary);
+            color: var(--accent-primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .login-lang-switcher {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            z-index: 10;
+        }
+
+        .sidebar-lang-switcher {
+            margin-bottom: 16px;
+        }
+
         .actions-cell {
             display: flex;
             gap: 8px;
@@ -1067,11 +1133,17 @@
 <body>
     <!-- Login Page -->
     <div class="login-container" id="loginPage">
+        <div class="lang-switcher login-lang-switcher">
+            <button class="lang-btn active" id="loginLangEn" onclick="switchLanguage('en')">EN</button>
+            <button class="lang-btn" id="loginLangZh" onclick="switchLanguage('zh')">中文</button>
+        </div>
         <div class="login-card">
             <div class="login-logo">
                 <h1>ApplyPath</h1>
                 <p>University Application Management</p>
             </div>
+            
+            <!-- Login Form -->
             <form id="loginForm">
                 <div class="form-group">
                     <label for="loginEmail">Email Address</label>
@@ -1083,7 +1155,37 @@
                 </div>
                 <button type="submit" class="btn btn-primary btn-full">Sign In</button>
             </form>
-            <div class="demo-accounts">
+            
+            <!-- Registration Form -->
+            <form id="registerForm" class="hidden">
+                <div class="form-group">
+                    <label for="registerName">Full Name</label>
+                    <input type="text" id="registerName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email Address</label>
+                    <input type="email" id="registerEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Password</label>
+                    <input type="password" id="registerPassword" placeholder="Create a password (min 6 characters)" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirm Password</label>
+                    <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+            </form>
+            
+            <div class="login-footer" id="loginFooter">
+                <p><span id="noAccountText">Don't have an account?</span> <a href="#" onclick="showRegisterForm(event)"><span id="registerLink">Register</span></a></p>
+            </div>
+            
+            <div class="login-footer hidden" id="registerFooter">
+                <p><span id="haveAccountText">Already have an account?</span> <a href="#" onclick="showLoginForm(event)"><span id="loginLink">Sign In</span></a></p>
+            </div>
+            
+            <div class="demo-accounts" id="demoAccountsSection">
                 <h4>Demo Accounts</h4>
                 <p><strong>Manager:</strong> manager@applypath.com / password</p>
                 <p><strong>Consultant:</strong> consultant@applypath.com / password</p>
@@ -1104,6 +1206,10 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
                 <h2>ApplyPath</h2>
+            </div>
+            <div class="lang-switcher sidebar-lang-switcher">
+                <button class="lang-btn active" id="sidebarLangEn" onclick="switchLanguage('en')">EN</button>
+                <button class="lang-btn" id="sidebarLangZh" onclick="switchLanguage('zh')">中文</button>
             </div>
             <nav class="sidebar-nav">
                 <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
@@ -1544,6 +1650,477 @@
 
     <script>
         // =====================
+        // TRANSLATIONS
+        // =====================
+        const translations = {
+            en: {
+                // Login
+                appName: 'ApplyPath',
+                appTagline: 'University Application Management',
+                emailLabel: 'Email Address',
+                emailPlaceholder: 'Enter your email',
+                passwordLabel: 'Password',
+                passwordPlaceholder: 'Enter your password',
+                signIn: 'Sign In',
+                demoAccounts: 'Demo Accounts',
+                manager: 'Manager',
+                consultant: 'Consultant',
+                
+                // Navigation
+                dashboard: 'Dashboard',
+                allProjects: 'All Projects',
+                team: 'Team',
+                signOut: 'Sign Out',
+                
+                // Dashboard
+                totalProjects: 'Total Projects',
+                active: 'Active',
+                pending: 'Pending',
+                completed: 'Completed',
+                urgent: 'Urgent',
+                recentProjects: 'Recent Projects',
+                newProject: 'New Project',
+                
+                // Table Headers
+                client: 'Client',
+                type: 'Type',
+                targetSchools: 'Target Schools',
+                assignedTo: 'Assigned To',
+                startDate: 'Start Date',
+                deadline: 'Deadline',
+                status: 'Status',
+                actions: 'Actions',
+                
+                // Project Types
+                language: 'Language',
+                studyAbroad: 'Study Abroad',
+                languageDesc: 'Language Training (TOEFL, IELTS, etc.)',
+                studyAbroadDesc: 'Study Abroad Application',
+                allTypes: 'All Types',
+                
+                // Filters
+                projectList: 'Project List',
+                searchClients: 'Search clients...',
+                allStatus: 'All Status',
+                allAssignees: 'All Assignees',
+                
+                // Team Page
+                teamMembers: 'Team Members',
+                addMember: 'Add Member',
+                name: 'Name',
+                email: 'Email',
+                role: 'Role',
+                projects: 'Projects',
+                you: 'You',
+                
+                // Project Detail
+                backToProjects: 'Back to Projects',
+                edit: 'Edit',
+                projectInfo: 'Project Information',
+                projectType: 'Project Type',
+                clientEmail: 'Client Email',
+                phone: 'Phone',
+                targetUniversities: 'Target Universities',
+                notes: 'Notes',
+                noNotes: 'No notes available.',
+                activityLog: 'Activity Log',
+                noActivity: 'No activity yet.',
+                noUniversities: 'No target universities specified.',
+                
+                // Modal - Project
+                addNewProject: 'Add New Project',
+                editProject: 'Edit Project',
+                clientName: 'Client Name',
+                phoneNumber: 'Phone Number',
+                targetUniversitiesLabel: 'Target Universities (comma separated)',
+                targetUniversitiesPlaceholder: 'MIT, Stanford, Harvard...',
+                applicationSeason: 'Application Season',
+                notesLabel: 'Notes',
+                notesPlaceholder: 'Additional notes about this project...',
+                cancel: 'Cancel',
+                saveProject: 'Save Project',
+                
+                // Modal - User
+                addTeamMember: 'Add Team Member',
+                fullName: 'Full Name',
+                password: 'Password',
+                
+                // Messages
+                noProjectsYet: 'No projects yet',
+                noProjectsFound: 'No projects found',
+                tryAdjusting: 'Try adjusting your search or filter criteria',
+                invalidLogin: 'Invalid email or password',
+                projectCreated: 'Project created successfully',
+                projectUpdated: 'Project updated successfully',
+                projectDeleted: 'Project deleted successfully',
+                memberAdded: 'Team member added successfully',
+                memberRemoved: 'Team member removed',
+                confirmDelete: 'Are you sure you want to delete this project? This action cannot be undone.',
+                confirmRemove: 'Are you sure you want to remove this team member?',
+                duplicateEmail: 'A user with this email already exists.',
+                unassigned: 'Unassigned',
+                
+                // Activity
+                activityCreated: 'Project created',
+                activityUpdated: 'Project updated',
+                
+                // Registration
+                createAccount: 'Create Account',
+                register: 'Register',
+                confirmPassword: 'Confirm Password',
+                alreadyHaveAccount: 'Already have an account?',
+                noAccount: "Don't have an account?",
+                registerSuccess: 'Account created successfully! Please login.',
+                passwordMismatch: 'Passwords do not match',
+                emailExists: 'An account with this email already exists',
+                allFieldsRequired: 'All fields are required',
+                passwordTooShort: 'Password must be at least 6 characters'
+            },
+            zh: {
+                // Login
+                appName: 'ApplyPath',
+                appTagline: '留学申请项目管理系统',
+                emailLabel: '邮箱地址',
+                emailPlaceholder: '请输入邮箱',
+                passwordLabel: '密码',
+                passwordPlaceholder: '请输入密码',
+                signIn: '登录',
+                demoAccounts: '演示账号',
+                manager: '管理员',
+                consultant: '顾问',
+                
+                // Navigation
+                dashboard: '仪表盘',
+                allProjects: '全部项目',
+                team: '团队',
+                signOut: '退出登录',
+                
+                // Dashboard
+                totalProjects: '项目总数',
+                active: '进行中',
+                pending: '待处理',
+                completed: '已完成',
+                urgent: '紧急',
+                recentProjects: '最近项目',
+                newProject: '新建项目',
+                
+                // Table Headers
+                client: '客户',
+                type: '类型',
+                targetSchools: '目标学校',
+                assignedTo: '负责人',
+                startDate: '开始日期',
+                deadline: '截止日期',
+                status: '状态',
+                actions: '操作',
+                
+                // Project Types
+                language: '语言',
+                studyAbroad: '留学',
+                languageDesc: '语言培训 (托福、雅思等)',
+                studyAbroadDesc: '留学申请服务',
+                allTypes: '全部类型',
+                
+                // Filters
+                projectList: '项目列表',
+                searchClients: '搜索客户...',
+                allStatus: '全部状态',
+                allAssignees: '全部负责人',
+                
+                // Team Page
+                teamMembers: '团队成员',
+                addMember: '添加成员',
+                name: '姓名',
+                email: '邮箱',
+                role: '角色',
+                projects: '项目数',
+                you: '我',
+                
+                // Project Detail
+                backToProjects: '返回项目列表',
+                edit: '编辑',
+                projectInfo: '项目信息',
+                projectType: '项目类型',
+                clientEmail: '客户邮箱',
+                phone: '电话',
+                targetUniversities: '目标院校',
+                notes: '备注',
+                noNotes: '暂无备注',
+                activityLog: '活动记录',
+                noActivity: '暂无活动记录',
+                noUniversities: '暂未指定目标院校',
+                
+                // Modal - Project
+                addNewProject: '新建项目',
+                editProject: '编辑项目',
+                clientName: '客户姓名',
+                phoneNumber: '电话号码',
+                targetUniversitiesLabel: '目标院校（用逗号分隔）',
+                targetUniversitiesPlaceholder: 'MIT, 斯坦福, 哈佛...',
+                applicationSeason: '申请季',
+                notesLabel: '备注',
+                notesPlaceholder: '关于此项目的其他备注...',
+                cancel: '取消',
+                saveProject: '保存项目',
+                
+                // Modal - User
+                addTeamMember: '添加团队成员',
+                fullName: '姓名',
+                password: '密码',
+                
+                // Messages
+                noProjectsYet: '暂无项目',
+                noProjectsFound: '未找到项目',
+                tryAdjusting: '请尝试调整搜索或筛选条件',
+                invalidLogin: '邮箱或密码错误',
+                projectCreated: '项目创建成功',
+                projectUpdated: '项目更新成功',
+                projectDeleted: '项目删除成功',
+                memberAdded: '成员添加成功',
+                memberRemoved: '成员已移除',
+                confirmDelete: '确定要删除此项目吗？此操作无法撤销。',
+                confirmRemove: '确定要移除此团队成员吗？',
+                duplicateEmail: '该邮箱已被使用',
+                unassigned: '未分配',
+                
+                // Activity
+                activityCreated: '项目创建',
+                activityUpdated: '项目更新',
+                
+                // Registration
+                createAccount: '创建账户',
+                register: '注册',
+                confirmPassword: '确认密码',
+                alreadyHaveAccount: '已有账户？',
+                noAccount: '还没有账户？',
+                registerSuccess: '账户创建成功！请登录。',
+                passwordMismatch: '两次输入的密码不一致',
+                emailExists: '该邮箱已被注册',
+                allFieldsRequired: '请填写所有必填项',
+                passwordTooShort: '密码长度至少6位'
+            }
+        };
+
+        let currentLang = localStorage.getItem('applypath_lang') || 'en';
+
+        function t(key) {
+            return translations[currentLang][key] || key;
+        }
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('applypath_lang', lang);
+            updateLangButtons();
+            updateAllText();
+            updateUI();
+        }
+
+        function updateLangButtons() {
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((btn.id.includes('En') && currentLang === 'en') || 
+                    (btn.id.includes('Zh') && currentLang === 'zh')) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function updateAllText() {
+            // Login page
+            document.querySelector('.login-logo h1').textContent = t('appName');
+            document.querySelector('.login-logo p').textContent = t('appTagline');
+            document.querySelector('label[for="loginEmail"]').textContent = t('emailLabel');
+            document.getElementById('loginEmail').placeholder = t('emailPlaceholder');
+            document.querySelector('label[for="loginPassword"]').textContent = t('passwordLabel');
+            document.getElementById('loginPassword').placeholder = t('passwordPlaceholder');
+            document.querySelector('#loginForm button[type="submit"]').textContent = t('signIn');
+            document.querySelector('.demo-accounts h4').textContent = t('demoAccounts');
+            document.querySelectorAll('.demo-accounts p')[0].innerHTML = `<strong>${t('manager')}:</strong> manager@applypath.com / password`;
+            document.querySelectorAll('.demo-accounts p')[1].innerHTML = `<strong>${t('consultant')}:</strong> consultant@applypath.com / password`;
+            
+            // Update auth form texts (login/register toggle)
+            updateAuthFormText();
+            
+            // Sidebar
+            document.querySelector('.sidebar-logo h2').textContent = t('appName');
+            document.querySelector('[data-page="dashboard"]').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                    <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+                    <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+                </svg>
+                ${t('dashboard')}`;
+            document.querySelector('[data-page="projects"]').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                ${t('allProjects')}`;
+            document.querySelector('[data-page="team"]').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                ${t('team')}`;
+            document.querySelector('.sidebar-footer .btn-ghost').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                ${t('signOut')}`;
+            
+            // Dashboard page
+            document.querySelector('#dashboardPage .page-header h1').textContent = t('dashboard');
+            document.querySelectorAll('.stat-label')[0].textContent = t('totalProjects');
+            document.querySelectorAll('.stat-label')[1].textContent = t('active');
+            document.querySelectorAll('.stat-label')[2].textContent = t('pending');
+            document.querySelectorAll('.stat-label')[3].textContent = t('completed');
+            document.querySelector('#dashboardPage .section-header h3').textContent = t('recentProjects');
+            
+            // Update new project buttons
+            document.querySelectorAll('.page-header-actions .btn-primary').forEach(btn => {
+                if (btn.closest('#dashboardPage') || btn.closest('#projectsPage')) {
+                    btn.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        ${t('newProject')}`;
+                }
+            });
+            
+            // Projects page
+            document.querySelector('#projectsPage .page-header h1').textContent = t('allProjects');
+            document.querySelector('#projectsPage .section-header h3').textContent = t('projectList');
+            document.getElementById('searchInput').placeholder = t('searchClients');
+            
+            // Update filter dropdowns
+            const statusFilter = document.getElementById('statusFilter');
+            statusFilter.innerHTML = `
+                <option value="">${t('allStatus')}</option>
+                <option value="active">${t('active')}</option>
+                <option value="pending">${t('pending')}</option>
+                <option value="completed">${t('completed')}</option>
+                <option value="urgent">${t('urgent')}</option>`;
+            
+            const typeFilter = document.getElementById('typeFilter');
+            typeFilter.innerHTML = `
+                <option value="">${t('allTypes')}</option>
+                <option value="language">🌐 ${t('language')}</option>
+                <option value="studyabroad">🎓 ${t('studyAbroad')}</option>`;
+            
+            // Empty state
+            document.querySelector('#emptyState h4').textContent = t('noProjectsFound');
+            document.querySelector('#emptyState p').textContent = t('tryAdjusting');
+            
+            // Team page
+            document.querySelector('#teamPage .page-header h1').textContent = t('teamMembers');
+            document.querySelector('#teamPage .btn-primary').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                ${t('addMember')}`;
+            
+            // Project detail
+            document.querySelector('.back-link').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                ${t('backToProjects')}`;
+            document.querySelector('#projectDetail .btn-secondary').innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                ${t('edit')}`;
+            
+            // Project modal
+            document.querySelector('label[for="clientName"]').textContent = t('clientName') + ' *';
+            document.querySelector('label[for="clientEmail"]').textContent = t('clientEmail') + ' *';
+            document.querySelector('label[for="clientPhone"]').textContent = t('phoneNumber');
+            document.querySelector('label[for="assignedTo"]').textContent = t('assignedTo');
+            document.querySelector('label[for="startDate"]').textContent = t('startDate') + ' *';
+            document.querySelector('label[for="deadline"]').textContent = t('deadline') + ' *';
+            document.querySelector('label[for="targetUniversities"]').textContent = t('targetUniversitiesLabel');
+            document.getElementById('targetUniversities').placeholder = t('targetUniversitiesPlaceholder');
+            document.querySelector('label[for="projectStatus"]').textContent = t('status');
+            document.querySelector('label[for="applicationSeason"]').textContent = t('applicationSeason');
+            document.querySelector('label[for="projectNotes"]').textContent = t('notesLabel');
+            document.getElementById('projectNotes').placeholder = t('notesPlaceholder');
+            document.querySelector('#projectModal .modal-footer .btn-secondary').textContent = t('cancel');
+            document.querySelector('#projectModal .modal-footer .btn-primary').textContent = t('saveProject');
+            
+            // Project type checkboxes
+            document.querySelector('#languageCheckbox .checkbox-label').textContent = '🌐 ' + t('language');
+            document.querySelector('#languageCheckbox .checkbox-desc').textContent = t('languageDesc');
+            document.querySelector('#studyabroadCheckbox .checkbox-label').textContent = '🎓 ' + t('studyAbroad');
+            document.querySelector('#studyabroadCheckbox .checkbox-desc').textContent = t('studyAbroadDesc');
+            
+            // User modal
+            document.querySelector('#userModal .modal-header h3').textContent = t('addTeamMember');
+            document.querySelector('label[for="newUserName"]').textContent = t('fullName') + ' *';
+            document.querySelector('label[for="newUserEmail"]').textContent = t('email') + ' *';
+            document.querySelector('label[for="newUserPassword"]').textContent = t('password') + ' *';
+            document.querySelector('label[for="newUserRole"]').textContent = t('role') + ' *';
+            document.querySelector('#userModal .modal-footer .btn-secondary').textContent = t('cancel');
+            document.querySelector('#userModal .modal-footer .btn-primary').textContent = t('addMember');
+            
+            // Update role options
+            const roleSelect = document.getElementById('newUserRole');
+            roleSelect.innerHTML = `
+                <option value="consultant">${t('consultant')}</option>
+                <option value="manager">${t('manager')}</option>`;
+            
+            // Update table headers
+            updateTableHeaders();
+        }
+
+        function updateTableHeaders() {
+            // Recent projects table
+            const recentTable = document.querySelector('#dashboardPage .projects-table thead tr');
+            if (recentTable) {
+                recentTable.innerHTML = `
+                    <th>${t('client')}</th>
+                    <th>${t('type')}</th>
+                    <th>${t('targetSchools')}</th>
+                    <th>${t('startDate')}</th>
+                    <th>${t('deadline')}</th>
+                    <th>${t('status')}</th>
+                    <th>${t('actions')}</th>`;
+            }
+            
+            // All projects table
+            const allTable = document.querySelector('#projectsPage .projects-table thead tr');
+            if (allTable) {
+                allTable.innerHTML = `
+                    <th>${t('client')}</th>
+                    <th>${t('type')}</th>
+                    <th>${t('targetSchools')}</th>
+                    <th>${t('assignedTo')}</th>
+                    <th>${t('startDate')}</th>
+                    <th>${t('deadline')}</th>
+                    <th>${t('status')}</th>
+                    <th>${t('actions')}</th>`;
+            }
+            
+            // Team table
+            const teamTable = document.querySelector('#teamPage .projects-table thead tr');
+            if (teamTable) {
+                teamTable.innerHTML = `
+                    <th>${t('name')}</th>
+                    <th>${t('email')}</th>
+                    <th>${t('role')}</th>
+                    <th>${t('projects')}</th>
+                    <th>${t('actions')}</th>`;
+            }
+        }
+
+        // =====================
         // DATA STORE
         // =====================
         const defaultUsers = [
@@ -1660,6 +2237,66 @@
             document.getElementById('loginPage').style.display = 'flex';
             document.getElementById('dashboard').classList.remove('active');
             document.body.classList.remove('is-manager');
+            showLoginForm();
+        }
+
+        function register(name, email, password) {
+            // Check if email already exists
+            if (users.find(u => u.email === email)) {
+                return { success: false, message: 'emailExists' };
+            }
+            
+            // Create new user (default role is consultant)
+            const newUser = {
+                id: Date.now(),
+                name: name,
+                email: email,
+                password: password,
+                role: 'consultant'
+            };
+            
+            users.push(newUser);
+            saveData();
+            return { success: true };
+        }
+
+        function showRegisterForm(e) {
+            if (e) e.preventDefault();
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginFooter').classList.add('hidden');
+            document.getElementById('registerFooter').classList.remove('hidden');
+            document.getElementById('demoAccountsSection').classList.add('hidden');
+            updateAuthFormText();
+        }
+
+        function showLoginForm(e) {
+            if (e) e.preventDefault();
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('loginFooter').classList.remove('hidden');
+            document.getElementById('registerFooter').classList.add('hidden');
+            document.getElementById('demoAccountsSection').classList.remove('hidden');
+            updateAuthFormText();
+        }
+
+        function updateAuthFormText() {
+            // Registration form labels
+            document.querySelector('label[for="registerName"]').textContent = t('fullName');
+            document.querySelector('label[for="registerEmail"]').textContent = t('emailLabel');
+            document.querySelector('label[for="registerPassword"]').textContent = t('passwordLabel');
+            document.querySelector('label[for="registerConfirmPassword"]').textContent = t('confirmPassword');
+            document.getElementById('registerName').placeholder = currentLang === 'zh' ? '请输入姓名' : 'Enter your full name';
+            document.getElementById('registerEmail').placeholder = t('emailPlaceholder');
+            document.getElementById('registerPassword').placeholder = currentLang === 'zh' ? '创建密码（至少6位）' : 'Create a password (min 6 characters)';
+            document.getElementById('registerConfirmPassword').placeholder = currentLang === 'zh' ? '再次输入密码' : 'Confirm your password';
+            document.querySelector('#registerForm button[type="submit"]').textContent = t('createAccount');
+            
+            // Footer texts
+            document.getElementById('noAccountText').textContent = t('noAccount');
+            document.getElementById('registerLink').textContent = t('register');
+            document.getElementById('haveAccountText').textContent = t('alreadyHaveAccount');
+            document.getElementById('loginLink').textContent = t('signIn');
         }
 
         function isManager() {
@@ -1711,8 +2348,8 @@
             const assignedToSelect = document.getElementById('assignedTo');
             const assigneeFilter = document.getElementById('assigneeFilter');
             
-            assignedToSelect.innerHTML = '<option value="">Unassigned</option>';
-            assigneeFilter.innerHTML = '<option value="">All Assignees</option>';
+            assignedToSelect.innerHTML = `<option value="">${t('unassigned')}</option>`;
+            assigneeFilter.innerHTML = `<option value="">${t('allAssignees')}</option>`;
             
             users.forEach(user => {
                 assignedToSelect.innerHTML += `<option value="${user.id}">${user.name}</option>`;
@@ -1722,7 +2359,7 @@
 
         function getUserName(userId) {
             const user = users.find(u => u.id === userId);
-            return user ? user.name : 'Unassigned';
+            return user ? user.name : t('unassigned');
         }
 
         function formatDate(dateStr) {
@@ -1740,16 +2377,34 @@
                         <line x1="2" y1="12" x2="22" y2="12"></line>
                         <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
                     </svg>
-                    语言
+                    ${t('language')}
                 </span>` : ''}
                 ${types.includes('studyabroad') ? `<span class="type-tag studyabroad">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                         <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                     </svg>
-                    留学
+                    ${t('studyAbroad')}
                 </span>` : ''}
             </div>`;
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'active': t('active'),
+                'pending': t('pending'),
+                'completed': t('completed'),
+                'urgent': t('urgent')
+            };
+            return statusMap[status] || status;
+        }
+
+        function getRoleText(role) {
+            const roleMap = {
+                'manager': t('manager'),
+                'consultant': t('consultant')
+            };
+            return roleMap[role] || role;
         }
 
         function updateCheckboxStyle(type) {
@@ -1767,7 +2422,7 @@
             const visibleProjects = getVisibleProjects().slice(0, 5);
             
             if (visibleProjects.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">No projects yet</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">${t('noProjectsYet')}</td></tr>`;
                 return;
             }
 
@@ -1781,7 +2436,7 @@
                     <td>${project.targetUniversities.slice(0, 2).join(', ')}${project.targetUniversities.length > 2 ? '...' : ''}</td>
                     <td>${formatDate(project.startDate)}</td>
                     <td>${formatDate(project.deadline)}</td>
-                    <td><span class="status-badge ${project.status}">${project.status}</span></td>
+                    <td><span class="status-badge ${project.status}">${getStatusText(project.status)}</span></td>
                     <td>
                         <div class="actions-cell">
                             <button class="action-btn" onclick="viewProject(${project.id})" title="View">
@@ -1858,7 +2513,7 @@
                     <td>${getUserName(project.assignedTo)}</td>
                     <td>${formatDate(project.startDate)}</td>
                     <td>${formatDate(project.deadline)}</td>
-                    <td><span class="status-badge ${project.status}">${project.status}</span></td>
+                    <td><span class="status-badge ${project.status}">${getStatusText(project.status)}</span></td>
                     <td>
                         <div class="actions-cell">
                             <button class="action-btn" onclick="viewProject(${project.id})" title="View">
@@ -1901,7 +2556,7 @@
                             </div>
                         </td>
                         <td>${user.email}</td>
-                        <td><span class="status-badge ${user.role === 'manager' ? 'active' : 'pending'}">${user.role}</span></td>
+                        <td><span class="status-badge ${user.role === 'manager' ? 'active' : 'pending'}">${getRoleText(user.role)}</span></td>
                         <td>${userProjectCount}</td>
                         <td>
                             <div class="actions-cell">
@@ -1912,7 +2567,7 @@
                                         <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                     </svg>
                                 </button>
-                                ` : '<span style="color: var(--text-muted); font-size: 12px;">You</span>'}
+                                ` : `<span style="color: var(--text-muted); font-size: 12px;">${t('you')}</span>`}
                             </div>
                         </td>
                     </tr>
@@ -1938,15 +2593,33 @@
             document.getElementById('detailPhone').textContent = project.clientPhone || '-';
             document.getElementById('detailStartDate').textContent = formatDate(project.startDate);
             document.getElementById('detailDeadline').textContent = formatDate(project.deadline);
-            document.getElementById('detailStatus').innerHTML = `<span class="status-badge ${project.status}">${project.status}</span>`;
+            document.getElementById('detailStatus').innerHTML = `<span class="status-badge ${project.status}">${getStatusText(project.status)}</span>`;
             document.getElementById('detailAssignee').textContent = getUserName(project.assignedTo);
             document.getElementById('detailProjectTypes').innerHTML = renderTypeTags(project.projectTypes);
-            document.getElementById('detailNotes').textContent = project.notes || 'No notes available.';
+            document.getElementById('detailNotes').textContent = project.notes || t('noNotes');
+
+            // Update detail card headers
+            document.querySelectorAll('.detail-card h4')[0].textContent = t('projectInfo');
+            document.querySelectorAll('.detail-card h4')[1].textContent = t('targetUniversities');
+            document.querySelectorAll('.detail-card h4')[2].textContent = t('notes');
+            document.querySelectorAll('.detail-card h4')[3].textContent = t('activityLog');
+            
+            // Update info labels
+            const infoLabels = document.querySelectorAll('.detail-main .info-label');
+            if (infoLabels.length >= 6) {
+                infoLabels[0].textContent = t('projectType');
+                infoLabels[1].textContent = t('clientEmail');
+                infoLabels[2].textContent = t('phone');
+                infoLabels[3].textContent = t('startDate');
+                infoLabels[4].textContent = t('deadline');
+                infoLabels[5].textContent = t('status');
+                infoLabels[6].textContent = t('assignedTo');
+            }
 
             // Universities
             const uniContainer = document.getElementById('detailUniversities');
             if (project.targetUniversities.length === 0) {
-                uniContainer.innerHTML = '<p style="color: var(--text-muted);">No target universities specified.</p>';
+                uniContainer.innerHTML = `<p style="color: var(--text-muted);">${t('noUniversities')}</p>`;
             } else {
                 uniContainer.innerHTML = project.targetUniversities.map(uni => `
                     <div class="university-item">
@@ -1958,7 +2631,7 @@
             // Activities
             const activityContainer = document.getElementById('detailActivity');
             if (!project.activities || project.activities.length === 0) {
-                activityContainer.innerHTML = '<p style="color: var(--text-muted);">No activity yet.</p>';
+                activityContainer.innerHTML = `<p style="color: var(--text-muted);">${t('noActivity')}</p>`;
             } else {
                 activityContainer.innerHTML = project.activities.map(activity => `
                     <div class="activity-item">
@@ -2017,12 +2690,12 @@
         }
 
         function deleteProject(id) {
-            if (!confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
+            if (!confirm(t('confirmDelete'))) return;
             
             projects = projects.filter(p => p.id !== id);
             saveData();
             updateUI();
-            showToast('Project deleted successfully');
+            showToast(t('projectDeleted'));
             
             if (currentProjectId === id) {
                 closeProjectDetail();
@@ -2059,23 +2732,23 @@
                 if (index !== -1) {
                     projects[index] = { ...projects[index], ...projectData };
                     projects[index].activities.push({
-                        text: 'Project updated',
+                        text: t('activityUpdated'),
                         date: new Date().toISOString().split('T')[0]
                     });
                 }
-                showToast('Project updated successfully');
+                showToast(t('projectUpdated'));
             } else {
                 // Add new
                 const newProject = {
                     id: Date.now(),
                     ...projectData,
                     activities: [{
-                        text: 'Project created',
+                        text: t('activityCreated'),
                         date: new Date().toISOString().split('T')[0]
                     }]
                 };
                 projects.push(newProject);
-                showToast('Project created successfully');
+                showToast(t('projectCreated'));
             }
 
             saveData();
@@ -2104,7 +2777,7 @@
 
             // Check for duplicate email
             if (users.find(u => u.email === newUser.email)) {
-                alert('A user with this email already exists.');
+                alert(t('duplicateEmail'));
                 return;
             }
 
@@ -2112,14 +2785,14 @@
             saveData();
             updateUI();
             closeModal('userModal');
-            showToast('Team member added successfully');
+            showToast(t('memberAdded'));
             
             // Reset form
             document.getElementById('userForm').reset();
         }
 
         function deleteUser(id) {
-            if (!confirm('Are you sure you want to remove this team member?')) return;
+            if (!confirm(t('confirmRemove'))) return;
             
             users = users.filter(u => u.id !== id);
             // Unassign projects
@@ -2128,7 +2801,7 @@
             });
             saveData();
             updateUI();
-            showToast('Team member removed');
+            showToast(t('memberRemoved'));
         }
 
         // =====================
@@ -2207,9 +2880,46 @@
             if (login(email, password)) {
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('dashboard').classList.add('active');
+                updateAllText();
                 updateUI();
             } else {
-                alert('Invalid email or password');
+                alert(t('invalidLogin'));
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert(t('allFieldsRequired'));
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert(t('passwordTooShort'));
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert(t('passwordMismatch'));
+                return;
+            }
+            
+            const result = register(name, email, password);
+            if (result.success) {
+                alert(t('registerSuccess'));
+                // Clear form and switch to login
+                document.getElementById('registerForm').reset();
+                showLoginForm();
+                // Pre-fill email for convenience
+                document.getElementById('loginEmail').value = email;
+            } else {
+                alert(t(result.message));
             }
         });
 
@@ -2230,7 +2940,13 @@
         if (currentUser) {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboard').classList.add('active');
+            updateLangButtons();
+            updateAllText();
             updateUI();
+        } else {
+            updateLangButtons();
+            updateAllText();
+            showLoginForm(); // Ensure login form is shown by default
         }
     </script>
 </body>

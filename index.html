@@ -1113,6 +1113,206 @@
             display: none !important;
         }
 
+        /* Priority Badges */
+        .priority-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .priority-badge.vip {
+            background: #FFEAEA;
+            color: #C44536;
+        }
+
+        .priority-badge.normal {
+            background: #FFF8E6;
+            color: #B8860B;
+        }
+
+        .priority-badge.low {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        /* Follow-up Status */
+        .followup-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .followup-status.overdue {
+            background: #FFEAEA;
+            color: #C44536;
+            animation: pulse 2s infinite;
+        }
+
+        .followup-status.today {
+            background: #FFF3E0;
+            color: #E65100;
+        }
+
+        .followup-status.upcoming {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Follow-up Card */
+        .followup-item {
+            background: var(--bg-accent);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 3px solid var(--accent-primary);
+        }
+
+        .followup-item .followup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .followup-item .followup-method {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            color: var(--text-secondary);
+        }
+
+        .followup-item .followup-content {
+            color: var(--text-primary);
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .followup-item .followup-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .followup-item .followup-next-action {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 13px;
+            color: var(--accent-primary);
+        }
+
+        /* Today's Follow-up Section */
+        .followup-alert {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            border: 1px solid #FFCC80;
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            margin-bottom: 24px;
+        }
+
+        .followup-alert.has-overdue {
+            background: linear-gradient(135deg, #FFEAEA 0%, #FFCDD2 100%);
+            border-color: #EF9A9A;
+        }
+
+        .followup-alert h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .followup-alert-count {
+            background: var(--danger);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .followup-alert-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .followup-alert-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.7);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            gap: 12px;
+        }
+
+        .followup-alert-item .client-info {
+            flex: 1;
+        }
+
+        .followup-alert-item .client-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .followup-alert-item .client-detail {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .followup-alert-item .overdue-badge {
+            background: var(--danger);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .followup-alert-item .due-today-badge {
+            background: var(--warning);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .followup-alert-item .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-contact {
+            background: var(--accent-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-contact:hover {
+            background: var(--accent-secondary);
+        }
+
         /* Manager-only elements */
         .manager-only {
             display: none;
@@ -1289,6 +1489,23 @@
                     <div class="stat-card">
                         <div class="stat-label">Completed</div>
                         <div class="stat-value" id="statCompleted">0</div>
+                    </div>
+                </div>
+
+                <!-- Follow-up Alert Section -->
+                <div class="followup-alert-section" id="followupAlertSection" style="display: none;">
+                    <div class="followup-alert" id="followupAlert">
+                        <h3>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <span id="followupAlertTitle">Today's Follow-ups</span>
+                            <span class="followup-alert-count" id="followupAlertCount">0</span>
+                        </h3>
+                        <div class="followup-alert-list" id="followupAlertList">
+                            <!-- Dynamic content -->
+                        </div>
                     </div>
                 </div>
 
@@ -1490,6 +1707,20 @@
 
                     <div class="detail-sidebar">
                         <div class="detail-card">
+                            <h4>Follow-up Records</h4>
+                            <button class="btn btn-primary btn-full" style="margin-bottom: 16px;" onclick="openFollowUpModal()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add Follow-up
+                            </button>
+                            <div class="followup-list" id="detailFollowUps">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+
+                        <div class="detail-card">
                             <h4>Activity Log</h4>
                             <div class="activity-list" id="detailActivity">
                             </div>
@@ -1584,6 +1815,16 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="projectPriority">Follow-up Priority</label>
+                            <select id="projectPriority">
+                                <option value="vip">🔴 VIP - Daily</option>
+                                <option value="normal" selected>🟡 Normal - Weekly</option>
+                                <option value="low">🟢 Low - Bi-weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
                             <label for="applicationSeason">Application Season</label>
                             <select id="applicationSeason">
                                 <option value="Fall 2025">Fall 2025</option>
@@ -1591,6 +1832,10 @@
                                 <option value="Fall 2026">Fall 2026</option>
                                 <option value="Spring 2026">Spring 2026</option>
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="nextFollowupDate">Next Follow-up Date</label>
+                            <input type="date" id="nextFollowupDate">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1647,6 +1892,48 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Add Member</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Follow-up Modal -->
+    <div class="modal-overlay" id="followUpModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="followUpModalTitle">Add Follow-up Record</h3>
+                <button class="modal-close" onclick="closeModal('followUpModal')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="followUpForm" onsubmit="saveFollowUp(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="followUpProjectId">
+                    <div class="form-group">
+                        <label for="followUpMethod">Contact Method *</label>
+                        <select id="followUpMethod" required>
+                            <option value="wechat">💬 微信 WeChat</option>
+                            <option value="phone">📞 电话 Phone</option>
+                            <option value="email">📧 邮件 Email</option>
+                            <option value="meeting">🤝 会面 Meeting</option>
+                            <option value="other">📝 其他 Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="followUpContent">Follow-up Content * (回访内容)</label>
+                        <textarea id="followUpContent" placeholder="记录本次联系的内容..." required style="min-height: 120px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="followUpNextAction">Next Action (下一步行动)</label>
+                        <textarea id="followUpNextAction" placeholder="下一步需要做什么..." style="min-height: 80px;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('followUpModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Record</button>
                 </div>
             </form>
         </div>
@@ -1733,6 +2020,10 @@
                     notes: p.notes,
                     projectTypes: p.project_types || [],
                     targetUniversities: p.target_universities || [],
+                    priority: p.priority || 'normal',
+                    reminderDays: p.reminder_days || 7,
+                    lastContactDate: p.last_contact_date,
+                    nextReminderDate: p.next_reminder_date,
                     createdAt: p.created_at,
                     updatedAt: p.updated_at
                 }));
@@ -1760,6 +2051,194 @@
                 text: a.description,
                 date: a.created_at
             }));
+        }
+
+        // 加载回访记录
+        async function loadFollowUps(projectId) {
+            if (!db) return [];
+            
+            const { data, error } = await db
+                .from('follow_ups')
+                .select(`
+                    *,
+                    contactor:profiles!contacted_by(name)
+                `)
+                .eq('project_id', projectId)
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error loading follow-ups:', error);
+                return [];
+            }
+            
+            return data || [];
+        }
+
+        // 获取需要今日联系的项目
+        function getProjectsDueToday() {
+            const today = new Date().toISOString().split('T')[0];
+            return projects.filter(p => {
+                if (p.status === 'completed') return false;
+                if (!p.nextReminderDate) return false;
+                return p.nextReminderDate <= today;
+            }).sort((a, b) => {
+                // 逾期的排在前面
+                if (a.nextReminderDate < today && b.nextReminderDate >= today) return -1;
+                if (b.nextReminderDate < today && a.nextReminderDate >= today) return 1;
+                // VIP 优先
+                const priorityOrder = { high: 0, normal: 1, low: 2 };
+                return (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
+            });
+        }
+
+        // 渲染今日待回访提醒
+        function renderFollowUpAlerts() {
+            const dueProjects = getProjectsDueToday();
+            const alertSection = document.getElementById('followupAlertSection');
+            const alertDiv = document.getElementById('followupAlert');
+            const alertList = document.getElementById('followupAlertList');
+            const alertCount = document.getElementById('followupAlertCount');
+            const alertTitle = document.getElementById('followupAlertTitle');
+            
+            if (dueProjects.length === 0) {
+                alertSection.style.display = 'none';
+                return;
+            }
+            
+            alertSection.style.display = 'block';
+            alertCount.textContent = dueProjects.length;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const overdueCount = dueProjects.filter(p => p.nextReminderDate < today).length;
+            
+            if (overdueCount > 0) {
+                alertDiv.classList.add('has-overdue');
+                alertTitle.textContent = t('overdueFollowUps');
+            } else {
+                alertDiv.classList.remove('has-overdue');
+                alertTitle.textContent = t('todayFollowUps');
+            }
+            
+            alertList.innerHTML = dueProjects.slice(0, 5).map(p => {
+                const isOverdue = p.nextReminderDate < today;
+                const daysOverdue = Math.floor((new Date(today) - new Date(p.nextReminderDate)) / (1000 * 60 * 60 * 24));
+                
+                return `
+                    <div class="followup-alert-item">
+                        <div class="client-info">
+                            <div class="client-name">${p.clientName}</div>
+                            <div class="client-detail">${p.clientWechat || p.clientPhone || ''} · ${getPriorityText(p.priority)}</div>
+                        </div>
+                        ${isOverdue 
+                            ? `<span class="overdue-badge">${daysOverdue} ${t('daysOverdue')}</span>` 
+                            : `<span class="due-today-badge">${t('dueToday')}</span>`}
+                        <div class="action-btns">
+                            <button class="btn-contact" onclick="openFollowUpModalForProject(${p.id})">${t('contactNow')}</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            if (dueProjects.length > 5) {
+                alertList.innerHTML += `<p style="text-align: center; color: var(--text-muted); margin-top: 12px;">还有 ${dueProjects.length - 5} 个项目需要联系...</p>`;
+            }
+        }
+
+        function getPriorityText(priority) {
+            const map = {
+                high: t('priorityHigh'),
+                normal: t('priorityNormal'),
+                low: t('priorityLow')
+            };
+            return map[priority] || map.normal;
+        }
+
+        function getContactMethodText(method) {
+            const map = {
+                wechat: t('wechatMethod'),
+                phone: t('phoneMethod'),
+                email: t('emailMethod'),
+                meeting: t('meetingMethod'),
+                other: t('otherMethod')
+            };
+            return map[method] || method;
+        }
+
+        // 打开回访记录弹窗
+        function openFollowUpModal() {
+            if (!currentProjectId) return;
+            document.getElementById('followUpProjectId').value = currentProjectId;
+            document.getElementById('followUpForm').reset();
+            document.getElementById('followUpModal').classList.add('active');
+        }
+
+        function openFollowUpModalForProject(projectId) {
+            document.getElementById('followUpProjectId').value = projectId;
+            document.getElementById('followUpForm').reset();
+            document.getElementById('followUpModal').classList.add('active');
+        }
+
+        // 保存回访记录
+        async function saveFollowUp(e) {
+            e.preventDefault();
+            
+            const projectId = document.getElementById('followUpProjectId').value;
+            const method = document.getElementById('followUpMethod').value;
+            const content = document.getElementById('followUpContent').value;
+            const nextAction = document.getElementById('followUpNextAction').value;
+            
+            try {
+                const { error } = await db
+                    .from('follow_ups')
+                    .insert({
+                        project_id: projectId,
+                        contacted_by: currentUser.id,
+                        contact_method: method,
+                        content: content,
+                        next_action: nextAction || null
+                    });
+                
+                if (error) throw error;
+                
+                closeModal('followUpModal');
+                showToast(t('followUpAdded'));
+                
+                // 刷新数据
+                await updateUI();
+                
+                // 如果在项目详情页，刷新回访记录
+                if (currentProjectId == projectId) {
+                    await renderFollowUpRecords(projectId);
+                }
+            } catch (err) {
+                console.error('Error saving follow-up:', err);
+                alert(err.message);
+            }
+        }
+
+        // 渲染回访记录列表
+        async function renderFollowUpRecords(projectId) {
+            const container = document.getElementById('detailFollowUps');
+            container.innerHTML = '<p style="color: var(--text-muted);">Loading...</p>';
+            
+            const followUps = await loadFollowUps(projectId);
+            
+            if (followUps.length === 0) {
+                container.innerHTML = `<p style="color: var(--text-muted);">${t('noFollowUps')}</p>`;
+                return;
+            }
+            
+            container.innerHTML = followUps.map(f => `
+                <div class="followup-item">
+                    <div class="followup-header">
+                        <span class="followup-method">${getContactMethodText(f.contact_method)}</span>
+                        <span class="followup-meta">${formatDate(f.created_at)}</span>
+                    </div>
+                    <div class="followup-content">${f.content}</div>
+                    ${f.next_action ? `<div class="followup-next-action">📌 ${f.next_action}</div>` : ''}
+                    <div class="followup-meta">by ${f.contactor?.name || 'Unknown'}</div>
+                </div>
+            `).join('');
         }
 
         // =====================
@@ -1877,6 +2356,36 @@
                 // Activity
                 activityCreated: 'Project created',
                 activityUpdated: 'Project updated',
+                
+                // Follow-up System
+                followUp: 'Follow-up',
+                addFollowUp: 'Add Follow-up Record',
+                followUpRecords: 'Follow-up Records',
+                followUpContent: 'Follow-up Content',
+                contactMethod: 'Contact Method',
+                nextAction: 'Next Action',
+                noFollowUps: 'No follow-up records yet',
+                followUpAdded: 'Follow-up record added',
+                todayFollowUps: "Today's Follow-ups",
+                overdueFollowUps: 'Overdue Follow-ups',
+                needContact: 'Need to contact',
+                daysOverdue: 'days overdue',
+                dueToday: 'Due today',
+                priority: 'Priority',
+                priorityHigh: '🔴 High (Daily)',
+                priorityNormal: '🟡 Normal (Weekly)',
+                priorityLow: '🟢 Low (Bi-weekly)',
+                reminderDays: 'Reminder Interval',
+                nextReminderDate: 'Next Reminder',
+                lastContactDate: 'Last Contact',
+                wechatMethod: 'WeChat',
+                phoneMethod: 'Phone',
+                emailMethod: 'Email',
+                meetingMethod: 'Meeting',
+                otherMethod: 'Other',
+                contactNow: 'Contact Now',
+                markContacted: 'Mark as Contacted',
+                viewProject: 'View Project',
                 
                 // Registration
                 createAccount: 'Create Account',
@@ -2001,6 +2510,36 @@
                 // Activity
                 activityCreated: '项目创建',
                 activityUpdated: '项目更新',
+                
+                // Follow-up System
+                followUp: '回访',
+                addFollowUp: '添加回访记录',
+                followUpRecords: '回访记录',
+                followUpContent: '回访内容',
+                contactMethod: '联系方式',
+                nextAction: '下一步行动',
+                noFollowUps: '暂无回访记录',
+                followUpAdded: '回访记录已添加',
+                todayFollowUps: '今日待回访',
+                overdueFollowUps: '逾期未回访',
+                needContact: '需要联系',
+                daysOverdue: '天逾期',
+                dueToday: '今日到期',
+                priority: '优先级',
+                priorityHigh: '🔴 重点客户（每天）',
+                priorityNormal: '🟡 普通客户（每周）',
+                priorityLow: '🟢 低优先级（两周）',
+                reminderDays: '提醒间隔',
+                nextReminderDate: '下次提醒',
+                lastContactDate: '最后联系',
+                wechatMethod: '微信',
+                phoneMethod: '电话',
+                emailMethod: '邮件',
+                meetingMethod: '会面',
+                otherMethod: '其他',
+                contactNow: '立即联系',
+                markContacted: '标记已联系',
+                viewProject: '查看项目',
                 
                 // Registration
                 createAccount: '创建账户',
@@ -2385,6 +2924,7 @@
             // Render tables
             renderRecentProjects();
             renderAllProjects();
+            renderFollowUpAlerts();
             if (isManager()) {
                 renderTeam();
             }
@@ -2703,6 +3243,9 @@
             // Show detail view
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById('projectDetail').classList.add('active');
+            
+            // Load follow-up records
+            await renderFollowUpRecords(id);
         }
 
         function closeProjectDetail() {
@@ -2727,6 +3270,8 @@
             document.getElementById('deadline').value = project.deadline || '';
             document.getElementById('targetUniversities').value = project.targetUniversities.join(', ');
             document.getElementById('projectStatus').value = project.status;
+            document.getElementById('projectPriority').value = project.priority || 'normal';
+            document.getElementById('nextFollowupDate').value = project.nextReminderDate || '';
             document.getElementById('applicationSeason').value = project.applicationSeason || 'Fall 2025';
             document.getElementById('projectNotes').value = project.notes || '';
             
@@ -2790,9 +3335,17 @@
                 project_types: projectTypes,
                 target_universities: document.getElementById('targetUniversities').value.split(',').map(u => u.trim()).filter(u => u),
                 status: document.getElementById('projectStatus').value,
+                priority: document.getElementById('projectPriority').value,
+                reminder_days: getPriorityReminderDays(document.getElementById('projectPriority').value),
+                next_reminder_date: document.getElementById('nextFollowupDate').value || new Date().toISOString().split('T')[0],
                 application_season: document.getElementById('applicationSeason').value,
                 notes: document.getElementById('projectNotes').value
             };
+            
+            function getPriorityReminderDays(priority) {
+                const days = { high: 1, normal: 7, low: 14 };
+                return days[priority] || 7;
+            }
 
             try {
                 if (id) {
@@ -2919,6 +3472,8 @@
                 document.getElementById('projectForm').reset();
                 document.getElementById('projectId').value = '';
                 document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('nextFollowupDate').value = new Date().toISOString().split('T')[0];
+                document.getElementById('projectPriority').value = 'normal';
                 // Reset checkboxes
                 document.getElementById('typeLanguage').checked = false;
                 document.getElementById('typeStudyAbroad').checked = false;
@@ -3101,3 +3656,4 @@
     </script>
 </body>
 </html>
+

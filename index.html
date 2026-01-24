@@ -1395,7 +1395,7 @@
             <!-- Registration Form -->
             <form id="registerForm" class="hidden">
                 <div class="form-group">
-                    <label for="registerName">Full Name</label>
+                    <label for="registerName">姓名</label>
                     <input type="text" id="registerName" placeholder="Enter your full name" required>
                 </div>
                 <div class="form-group">
@@ -1455,13 +1455,13 @@
                         <rect x="3" y="14" width="7" height="7" rx="1"></rect>
                         <rect x="14" y="14" width="7" height="7" rx="1"></rect>
                     </svg>
-                    Dashboard
+                    仪表盘
                 </a>
                 <a class="nav-item" data-page="projects" onclick="showPage('projects')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                     </svg>
-                    All Projects
+                    全部项目
                 </a>
                 <a class="nav-item manager-only" data-page="team" onclick="showPage('team')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1470,15 +1470,15 @@
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                         <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                     </svg>
-                    Team
+                    团队
                 </a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
                     <div class="user-avatar" id="userAvatar">JD</div>
                     <div class="user-details">
-                        <div class="user-name" id="userName">John Doe</div>
-                        <div class="user-role" id="userRole">Manager</div>
+                        <div class="user-name" id="userName">用户名</div>
+                        <div class="user-role" id="userRole">角色</div>
                     </div>
                 </div>
                 <button class="btn btn-ghost btn-full" style="margin-top: 12px;" onclick="logout()">
@@ -1487,7 +1487,7 @@
                         <polyline points="16 17 21 12 16 7"></polyline>
                         <line x1="21" y1="12" x2="9" y2="12"></line>
                     </svg>
-                    Sign Out
+                    退出登录
                 </button>
             </div>
         </aside>
@@ -1496,33 +1496,33 @@
             <!-- Dashboard Page -->
             <div class="page" id="dashboardPage">
                 <div class="page-header">
-                    <h1>Dashboard</h1>
+                    <h1>仪表盘</h1>
                     <div class="page-header-actions manager-only">
                         <button class="btn btn-primary" onclick="openModal('addProject')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
-                            New Project
+                            新建项目
                         </button>
                     </div>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-label">Total Projects</div>
+                        <div class="stat-label">项目总数</div>
                         <div class="stat-value" id="statTotal">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Active</div>
+                        <div class="stat-label">进行中</div>
                         <div class="stat-value" id="statActive">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Pending</div>
+                        <div class="stat-label">待处理</div>
                         <div class="stat-value" id="statPending">0</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-label">Completed</div>
+                        <div class="stat-label">已完成</div>
                         <div class="stat-value" id="statCompleted">0</div>
                     </div>
                 </div>
@@ -1546,17 +1546,17 @@
 
                 <div class="projects-section">
                     <div class="section-header">
-                        <h3>Recent Projects</h3>
+                        <h3>最近项目</h3>
                     </div>
                     <table class="projects-table">
                         <thead>
                             <tr>
-                                <th>Client</th>
-                                <th>Type</th>
-                                <th>Priority</th>
-                                <th>Next Reminder</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th>客户</th>
+                                <th>类型</th>
+                                <th>优先级</th>
+                                <th>下次提醒</th>
+                                <th>状态</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody id="recentProjectsBody">
@@ -1568,63 +1568,63 @@
             <!-- Projects Page -->
             <div class="page hidden" id="projectsPage">
                 <div class="page-header">
-                    <h1>All Projects</h1>
+                    <h1>全部项目</h1>
                     <div class="page-header-actions manager-only">
                         <button class="btn btn-primary" onclick="openModal('addProject')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
-                            New Project
+                            新建项目
                         </button>
                     </div>
                 </div>
 
                 <div class="projects-section">
                     <div class="section-header">
-                        <h3>Project List</h3>
+                        <h3>项目列表</h3>
                         <div class="search-filter">
                             <div class="search-input">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="11" cy="11" r="8"></circle>
                                     <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                                 </svg>
-                                <input type="text" id="searchInput" placeholder="Search clients..." oninput="filterProjects()">
+                                <input type="text" id="searchInput" placeholder="搜索客户..." oninput="filterProjects()">
                             </div>
                             <select class="filter-select" id="statusFilter" onchange="filterProjects()">
-                                <option value="">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="pending">Pending</option>
-                                <option value="completed">Completed</option>
-                                <option value="urgent">Urgent</option>
-                                <option value="invalid">❌ Invalid</option>
+                                <option value="">全部状态</option>
+                                <option value="active">进行中</option>
+                                <option value="pending">待处理</option>
+                                <option value="completed">已完成</option>
+                                <option value="urgent">紧急</option>
+                                <option value="invalid">❌ 无效</option>
                             </select>
                             <select class="filter-select" id="typeFilter" onchange="filterProjects()">
-                                <option value="">All Types</option>
+                                <option value="">全部类型</option>
                                 <option value="language">🌐 语言类</option>
                                 <option value="studyabroad">🎓 留学类</option>
                             </select>
                             <select class="filter-select manager-only" id="priorityFilter" onchange="filterProjects()">
-                                <option value="">All Priorities</option>
+                                <option value="">全部优先级</option>
                                 <option value="high">🔴 重点客户</option>
                                 <option value="normal">🟡 普通客户</option>
                                 <option value="low">🟢 低优先级</option>
                             </select>
                             <select class="filter-select manager-only" id="assigneeFilter" onchange="filterProjects()">
-                                <option value="">All Assignees</option>
+                                <option value="">全部负责人</option>
                             </select>
                         </div>
                     </div>
                     <table class="projects-table">
                         <thead>
                             <tr>
-                                <th>Client</th>
-                                <th>Type</th>
-                                <th>Priority</th>
-                                <th>Assigned To</th>
-                                <th>Next Reminder</th>
-                                <th>Status</th>
-                                <th>Actions</th>
+                                <th>客户</th>
+                                <th>类型</th>
+                                <th>优先级</th>
+                                <th>负责人</th>
+                                <th>下次提醒</th>
+                                <th>状态</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody id="allProjectsBody">
@@ -1634,8 +1634,8 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                         </svg>
-                        <h4>No projects found</h4>
-                        <p>Try adjusting your search or filter criteria</p>
+                        <h4>未找到项目</h4>
+                        <p>请尝试调整搜索或筛选条件</p>
                     </div>
                 </div>
             </div>
@@ -1643,14 +1643,14 @@
             <!-- Team Page (Manager Only) -->
             <div class="page hidden" id="teamPage">
                 <div class="page-header">
-                    <h1>Team Members</h1>
+                    <h1>团队成员</h1>
                     <div class="page-header-actions">
                         <button class="btn btn-primary" onclick="openModal('addUser')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
-                            Add Member
+                            添加成员
                         </button>
                     </div>
                 </div>
@@ -1659,11 +1659,11 @@
                     <table class="projects-table">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Projects</th>
-                                <th>Actions</th>
+                                <th>姓名</th>
+                                <th>邮箱</th>
+                                <th>角色</th>
+                                <th>项目数</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody id="teamBody">
@@ -1679,18 +1679,18 @@
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    Back to Projects
+                    返回项目列表
                 </a>
 
                 <div class="page-header">
-                    <h1 id="detailClientName">Client Name</h1>
+                    <h1 id="detailClientName">客户姓名</h1>
                     <div class="page-header-actions">
                         <button class="btn btn-secondary manager-only" onclick="editCurrentProject()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
-                            Edit
+                            编辑
                         </button>
                     </div>
                 </div>
@@ -1698,62 +1698,62 @@
                 <div class="detail-grid">
                     <div class="detail-main">
                         <div class="detail-card">
-                            <h4>Project Information</h4>
+                            <h4>项目信息</h4>
                             <div class="info-row">
-                                <span class="info-label">Project Type</span>
+                                <span class="info-label">项目类型</span>
                                 <span class="info-value" id="detailProjectTypes">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">WeChat</span>
+                                <span class="info-label">微信</span>
                                 <span class="info-value" id="detailWechat">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Phone</span>
+                                <span class="info-label">电话</span>
                                 <span class="info-value" id="detailPhone">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Client Email</span>
+                                <span class="info-label">客户邮箱</span>
                                 <span class="info-value" id="detailEmail">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Start Date</span>
+                                <span class="info-label">开始日期</span>
                                 <span class="info-value" id="detailStartDate">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Deadline</span>
+                                <span class="info-label">截止日期</span>
                                 <span class="info-value" id="detailDeadline">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Status</span>
+                                <span class="info-label">状态</span>
                                 <span class="info-value" id="detailStatus">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Assigned To</span>
+                                <span class="info-label">负责人</span>
                                 <span class="info-value" id="detailAssignee">-</span>
                             </div>
                         </div>
 
                         <div class="detail-card">
-                            <h4>Target Universities</h4>
+                            <h4>目标院校</h4>
                             <div class="universities-list" id="detailUniversities">
                             </div>
                         </div>
 
                         <div class="detail-card">
-                            <h4>Notes</h4>
-                            <div class="notes-content" id="detailNotes">No notes available.</div>
+                            <h4>备注</h4>
+                            <div class="notes-content" id="detailNotes">暂无备注</div>
                         </div>
                     </div>
 
                     <div class="detail-sidebar">
                         <div class="detail-card">
-                            <h4>Follow-up Records</h4>
+                            <h4>回访记录</h4>
                             <button class="btn btn-primary btn-full" style="margin-bottom: 16px;" onclick="openFollowUpModal()">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                 </svg>
-                                Add Follow-up
+                                添加回访
                             </button>
                             <div class="followup-list" id="detailFollowUps">
                                 <!-- Dynamic content -->
@@ -1761,7 +1761,7 @@
                         </div>
 
                         <div class="detail-card">
-                            <h4>Activity Log</h4>
+                            <h4>活动记录</h4>
                             <div class="activity-list" id="detailActivity">
                             </div>
                         </div>
@@ -1775,7 +1775,7 @@
     <div class="modal-overlay" id="projectModal">
         <div class="modal">
             <div class="modal-header">
-                <h3 id="projectModalTitle">Add New Project</h3>
+                <h3 id="projectModalTitle">新建项目</h3>
                 <button class="modal-close" onclick="closeModal('projectModal')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1788,26 +1788,26 @@
                     <input type="hidden" id="projectId">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="clientName">Client Name *</label>
+                            <label for="clientName">客户姓名 *</label>
                             <input type="text" id="clientName" required>
                         </div>
                         <div class="form-group">
-                            <label for="clientEmail">Client Email</label>
+                            <label for="clientEmail">客户邮箱</label>
                             <input type="email" id="clientEmail">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="clientWechat">WeChat *</label>
+                            <label for="clientWechat">微信 *</label>
                             <input type="text" id="clientWechat" required>
                         </div>
                         <div class="form-group">
-                            <label for="clientPhone">Phone Number *</label>
+                            <label for="clientPhone">手机号 *</label>
                             <input type="tel" id="clientPhone" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="assignedTo">Assigned To</label>
+                        <label for="assignedTo">负责人</label>
                         <select id="assignedTo">
                         </select>
                     </div>
@@ -1832,61 +1832,61 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="startDate">Start Date</label>
+                            <label for="startDate">开始日期</label>
                             <input type="date" id="startDate">
                         </div>
                         <div class="form-group">
-                            <label for="deadline">Deadline</label>
+                            <label for="deadline">截止日期</label>
                             <input type="date" id="deadline">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="targetUniversities">Target Universities (comma separated)</label>
-                        <input type="text" id="targetUniversities" placeholder="MIT, Stanford, Harvard...">
+                        <label for="targetUniversities">目标院校（用逗号分隔）</label>
+                        <input type="text" id="targetUniversities" placeholder="MIT, 斯坦福, 哈佛...">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="projectStatus">Status</label>
+                            <label for="projectStatus">状态</label>
                             <select id="projectStatus">
-                                <option value="pending">Pending</option>
-                                <option value="active">Active</option>
-                                <option value="urgent">Urgent</option>
-                                <option value="completed">Completed</option>
-                                <option value="invalid">❌ Invalid</option>
+                                <option value="pending">待处理</option>
+                                <option value="active">进行中</option>
+                                <option value="urgent">紧急</option>
+                                <option value="completed">已完成</option>
+                                <option value="invalid">❌ 无效</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="projectPriority">Follow-up Priority</label>
+                            <label for="projectPriority">回访优先级</label>
                             <select id="projectPriority">
-                                <option value="vip">🔴 VIP - Daily</option>
-                                <option value="normal" selected>🟡 Normal - Weekly</option>
-                                <option value="low">🟢 Low - Bi-weekly</option>
+                                <option value="high">🔴 重点客户（每天）</option>
+                                <option value="normal" selected>🟡 普通客户（每周）</option>
+                                <option value="low">🟢 低优先级（两周）</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="applicationSeason">Application Season</label>
+                            <label for="applicationSeason">申请季</label>
                             <select id="applicationSeason">
-                                <option value="Fall 2025">Fall 2025</option>
-                                <option value="Spring 2025">Spring 2025</option>
-                                <option value="Fall 2026">Fall 2026</option>
-                                <option value="Spring 2026">Spring 2026</option>
+                                <option value="Fall 2025">2025秋季</option>
+                                <option value="Spring 2025">2025春季</option>
+                                <option value="Fall 2026">2026秋季</option>
+                                <option value="Spring 2026">2026春季</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="nextFollowupDate">Next Follow-up Date</label>
+                            <label for="nextFollowupDate">下次提醒日期</label>
                             <input type="date" id="nextFollowupDate">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="projectNotes">Notes *</label>
-                        <textarea id="projectNotes" placeholder="Additional notes about this project..." required></textarea>
+                        <label for="projectNotes">备注 *</label>
+                        <textarea id="projectNotes" placeholder="关于此项目的其他备注..." required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Project</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('projectModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存项目</button>
                 </div>
             </form>
         </div>
@@ -1896,7 +1896,7 @@
     <div class="modal-overlay" id="userModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>Add Team Member</h3>
+                <h3>添加团队成员</h3>
                 <button class="modal-close" onclick="closeModal('userModal')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1908,31 +1908,31 @@
                 <div class="modal-body">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="newUserName">Full Name *</label>
+                            <label for="newUserName">姓名 *</label>
                             <input type="text" id="newUserName" required>
                         </div>
                         <div class="form-group">
-                            <label for="newUserEmail">Email *</label>
+                            <label for="newUserEmail">邮箱 *</label>
                             <input type="email" id="newUserEmail" required>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="newUserPassword">Password *</label>
+                            <label for="newUserPassword">密码 *</label>
                             <input type="password" id="newUserPassword" required>
                         </div>
                         <div class="form-group">
-                            <label for="newUserRole">Role *</label>
+                            <label for="newUserRole">角色 *</label>
                             <select id="newUserRole" required>
-                                <option value="consultant">Consultant</option>
-                                <option value="manager">Manager</option>
+                                <option value="consultant">顾问</option>
+                                <option value="manager">管理员</option>
                             </select>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add Member</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('userModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加成员</button>
                 </div>
             </form>
         </div>
@@ -1942,7 +1942,7 @@
     <div class="modal-overlay" id="followUpModal">
         <div class="modal">
             <div class="modal-header">
-                <h3 id="followUpModalTitle">Add Follow-up Record</h3>
+                <h3 id="followUpModalTitle">添加回访记录</h3>
                 <button class="modal-close" onclick="closeModal('followUpModal')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -1954,27 +1954,27 @@
                 <div class="modal-body">
                     <input type="hidden" id="followUpProjectId">
                     <div class="form-group">
-                        <label for="followUpMethod">Contact Method *</label>
+                        <label for="followUpMethod">联系方式 *</label>
                         <select id="followUpMethod" required>
-                            <option value="wechat">💬 微信 WeChat</option>
-                            <option value="phone">📞 电话 Phone</option>
-                            <option value="email">📧 邮件 Email</option>
-                            <option value="meeting">🤝 会面 Meeting</option>
-                            <option value="other">📝 其他 Other</option>
+                            <option value="wechat">💬 微信</option>
+                            <option value="phone">📞 电话</option>
+                            <option value="email">📧 邮件</option>
+                            <option value="meeting">🤝 会面</option>
+                            <option value="other">📝 其他</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="followUpContent">Follow-up Content * (回访内容)</label>
+                        <label for="followUpContent">回访内容 *</label>
                         <textarea id="followUpContent" placeholder="记录本次联系的内容..." required style="min-height: 120px;"></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="followUpNextAction">Next Action (下一步行动)</label>
+                        <label for="followUpNextAction">下一步行动</label>
                         <textarea id="followUpNextAction" placeholder="下一步需要做什么..." style="min-height: 80px;"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('followUpModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Record</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('followUpModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存记录</button>
                 </div>
             </form>
         </div>
@@ -1982,7 +1982,7 @@
 
     <!-- Toast -->
     <div class="toast" id="toast">
-        <span id="toastMessage">Success!</span>
+        <span id="toastMessage">成功!</span>
     </div>
 
     <script>
@@ -3383,7 +3383,7 @@
             const project = projects.find(p => p.id === id);
             if (!project) return;
 
-            document.getElementById('projectModalTitle').textContent = 'Edit Project';
+            document.getElementById('projectModalTitle').textContent = t('editProject');
             document.getElementById('projectId').value = project.id;
             document.getElementById('clientName').value = project.clientName;
             document.getElementById('clientEmail').value = project.clientEmail || '';
@@ -3596,7 +3596,7 @@
         // =====================
         function openModal(type) {
             if (type === 'addProject') {
-                document.getElementById('projectModalTitle').textContent = 'Add New Project';
+                document.getElementById('projectModalTitle').textContent = t('addNewProject');
                 document.getElementById('projectForm').reset();
                 document.getElementById('projectId').value = '';
                 document.getElementById('startDate').value = new Date().toISOString().split('T')[0];

@@ -1991,9 +1991,9 @@
         // =====================
         // ⚠️ 请替换为您自己的 Supabase 项目配置
         // ⚠️ Replace with your own Supabase project configuration
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // 例如: https://xxxxx.supabase.co
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // 从 Supabase 控制台获取
-        
+        const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
+
         // 检查配置
         const isConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
         
@@ -2718,6 +2718,16 @@
                 <option value="">${t('allTypes')}</option>
                 <option value="language">🌐 ${t('language')}</option>
                 <option value="studyabroad">🎓 ${t('studyAbroad')}</option>`;
+
+            // Priority filter - 添加这部分
+            const priorityFilter = document.getElementById('priorityFilter');
+            if (priorityFilter) {
+                priorityFilter.innerHTML = `
+                    <option value="">${t('allPriorities')}</option>
+                    <option value="vip">${t('priorityHigh')}</option>
+                    <option value="normal">${t('priorityNormal')}</option>
+                    <option value="low">${t('priorityLow')}</option>`;
+            }
             
             // Empty state
             document.querySelector('#emptyState h4').textContent = t('noProjectsFound');

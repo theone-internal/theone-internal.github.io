@@ -3448,17 +3448,21 @@
             if (document.getElementById('typeLanguage').checked) projectTypes.push('language');
             if (document.getElementById('typeStudyAbroad').checked) projectTypes.push('studyabroad');
             
+            // 如果状态是 invalid，自动设为未分配
+            const status = document.getElementById('projectStatus').value;
+            const assignedTo = status === 'invalid' ? null : (document.getElementById('assignedTo').value || null);
+            
             const projectData = {
                 client_name: document.getElementById('clientName').value,
                 client_email: document.getElementById('clientEmail').value || null,
                 client_wechat: document.getElementById('clientWechat').value,
                 client_phone: document.getElementById('clientPhone').value,
-                assigned_to: document.getElementById('assignedTo').value || null,
+                assigned_to: assignedTo,
                 start_date: document.getElementById('startDate').value || null,
                 deadline: document.getElementById('deadline').value || null,
                 project_types: projectTypes,
                 target_universities: document.getElementById('targetUniversities').value.split(',').map(u => u.trim()).filter(u => u),
-                status: document.getElementById('projectStatus').value,
+                status: status,
                 priority: document.getElementById('projectPriority').value,
                 reminder_days: getPriorityReminderDays(document.getElementById('projectPriority').value),
                 next_reminder_date: document.getElementById('nextFollowupDate').value || new Date().toISOString().split('T')[0],
@@ -3781,4 +3785,3 @@
 </body>
 </html>
 
-        

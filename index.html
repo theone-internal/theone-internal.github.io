@@ -1867,12 +1867,17 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="applicationSeason">申请季</label>
-                            <select id="applicationSeason">
-                                <option value="Fall 2025">2025秋季</option>
-                                <option value="Spring 2025">2025春季</option>
-                                <option value="Fall 2026">2026秋季</option>
-                                <option value="Spring 2026">2026春季</option>
-                            </select>
+                            <div class="season-picker" style="display: flex; gap: 12px;">
+                                <select id="applicationSeasonTerm" style="flex: 1;">
+                                    <option value="Spring">春季 Spring</option>
+                                    <option value="Fall" selected>秋季 Fall</option>
+                                    <option value="Summer">夏季 Summer</option>
+                                    <option value="Winter">冬季 Winter</option>
+                                </select>
+                                <select id="applicationSeasonYear" style="flex: 1;">
+                                </select>
+                            </div>
+                            <input type="hidden" id="applicationSeason">
                         </div>
                         <div class="form-group">
                             <label for="nextFollowupDate">下次提醒日期</label>
@@ -3406,7 +3411,8 @@
             document.getElementById('projectStatus').value = project.status;
             document.getElementById('projectPriority').value = project.priority || 'normal';
             document.getElementById('nextFollowupDate').value = project.nextReminderDate || '';
-            document.getElementById('applicationSeason').value = project.applicationSeason || 'Fall 2025';
+            initSeasonPicker();
+            setSeasonPickerValue(project.applicationSeason || 'Fall 2026');
             document.getElementById('projectNotes').value = project.notes || '';
             
             // Set project types
@@ -3617,11 +3623,13 @@
                 document.getElementById('typeStudyAbroad').checked = false;
                 document.getElementById('languageCheckbox').classList.remove('checked');
                 document.getElementById('studyabroadCheckbox').classList.remove('checked');
+                initSeasonPicker();
                 document.getElementById('projectModal').classList.add('active');
             } else if (type === 'addUser') {
                 document.getElementById('userForm').reset();
                 document.getElementById('userModal').classList.add('active');
             } else if (type === 'projectModal') {
+                initSeasonPicker();
                 document.getElementById('projectModal').classList.add('active');
             }
         }
@@ -3666,6 +3674,58 @@
             document.getElementById('toastMessage').textContent = message;
             toast.classList.add('active');
             setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        // =====================
+        // APPLICATION SEASON PICKER
+        // =====================
+        function initSeasonPicker() {
+            const yearSelect = document.getElementById('applicationSeasonYear');
+            const currentYear = new Date().getFullYear();
+            
+            // 生成年份选项：当前年份 -1 到 +5
+            yearSelect.innerHTML = '';
+            for (let year = currentYear - 1; year <= currentYear + 5; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year + '年';
+                if (year === currentYear + 1) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+            
+            // 监听变化
+            document.getElementById('applicationSeasonTerm').addEventListener('change', updateSeasonValue);
+            document.getElementById('applicationSeasonYear').addEventListener('change', updateSeasonValue);
+            updateSeasonValue();
+        }
+
+        function updateSeasonValue() {
+            const term = document.getElementById('applicationSeasonTerm').value;
+            const year = document.getElementById('applicationSeasonYear').value;
+            document.getElementById('applicationSeason').value = `${term} ${year}`;
+        }
+
+        function setSeasonPickerValue(seasonStr) {
+            if (!seasonStr) return;
+            
+            const termSelect = document.getElementById('applicationSeasonTerm');
+            const yearSelect = document.getElementById('applicationSeasonYear');
+            
+            // 匹配 "Fall 2025" 格式
+            const match = seasonStr.match(/(Spring|Fall|Summer|Winter)\s*(\d{4})/i);
+            if (match) {
+                termSelect.value = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+                const year = match[2];
+                // 确保年份存在
+                if (!yearSelect.querySelector(`option[value="${year}"]`)) {
+                    const opt = document.createElement('option');
+                    opt.value = year;
+                    opt.textContent = year + '年';
+                    yearSelect.appendChild(opt);
+                }
+                yearSelect.value = year;
+            }
+            updateSeasonValue();
         }
 
         // =====================

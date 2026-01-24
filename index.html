@@ -1606,7 +1606,7 @@
                             </select>
                             <select class="filter-select manager-only" id="priorityFilter" onchange="filterProjects()">
                                 <option value="">全部优先级</option>
-                                <option value="high">🔴 重点客户</option>
+                                <option value="vip">🔴 重点客户</option>
                                 <option value="normal">🟡 普通客户</option>
                                 <option value="low">🟢 低优先级</option>
                             </select>
@@ -1858,7 +1858,7 @@
                         <div class="form-group">
                             <label for="projectPriority">回访优先级</label>
                             <select id="projectPriority">
-                                <option value="high">🔴 重点客户（每天）</option>
+                                <option value="vip">🔴 重点客户（每天）</option>
                                 <option value="normal" selected>🟡 普通客户（每周）</option>
                                 <option value="low">🟢 低优先级（两周）</option>
                             </select>
@@ -2127,7 +2127,7 @@
                 if (a.nextReminderDate < today && b.nextReminderDate >= today) return -1;
                 if (b.nextReminderDate < today && a.nextReminderDate >= today) return 1;
                 // VIP 优先
-                const priorityOrder = { high: 0, normal: 1, low: 2 };
+                const priorityOrder = { vip: 0, normal: 1, low: 2 };
                 return (priorityOrder[a.priority] || 1) - (priorityOrder[b.priority] || 1);
             });
         }
@@ -2187,7 +2187,7 @@
 
         function getPriorityText(priority) {
             const map = {
-                high: t('priorityHigh'),
+                vip: t('priorityHigh'),
                 normal: t('priorityNormal'),
                 low: t('priorityLow')
             };
@@ -3218,7 +3218,7 @@
 
         function renderPriorityBadge(priority) {
             const badges = {
-                high: '<span class="priority-badge vip">🔴 重点</span>',
+                vip: '<span class="priority-badge vip">🔴 重点</span>',
                 normal: '<span class="priority-badge normal">🟡 普通</span>',
                 low: '<span class="priority-badge low">🟢 低</span>'
             };
@@ -3471,7 +3471,7 @@
             };
             
             function getPriorityReminderDays(priority) {
-                const days = { high: 1, normal: 7, low: 14 };
+                const days = { vip: 1, normal: 7, low: 14 };
                 return days[priority] || 7;
             }
 
@@ -3784,4 +3784,5 @@
     </script>
 </body>
 </html>
+
 

@@ -1447,12 +1447,16 @@
                                 <span class="info-value" id="detailProjectTypes">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">Client Email</span>
-                                <span class="info-value" id="detailEmail">-</span>
+                                <span class="info-label">WeChat</span>
+                                <span class="info-value" id="detailWechat">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Phone</span>
                                 <span class="info-value" id="detailPhone">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Client Email</span>
+                                <span class="info-value" id="detailEmail">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">Start Date</span>
@@ -1517,20 +1521,24 @@
                             <input type="text" id="clientName" required>
                         </div>
                         <div class="form-group">
-                            <label for="clientEmail">Client Email *</label>
-                            <input type="email" id="clientEmail" required>
+                            <label for="clientEmail">Client Email</label>
+                            <input type="email" id="clientEmail">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="clientPhone">Phone Number</label>
-                            <input type="tel" id="clientPhone">
+                            <label for="clientWechat">WeChat *</label>
+                            <input type="text" id="clientWechat" required>
                         </div>
                         <div class="form-group">
-                            <label for="assignedTo">Assigned To</label>
-                            <select id="assignedTo">
-                            </select>
+                            <label for="clientPhone">Phone Number *</label>
+                            <input type="tel" id="clientPhone" required>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignedTo">Assigned To</label>
+                        <select id="assignedTo">
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Project Type</label>
@@ -1553,12 +1561,12 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="startDate">Start Date *</label>
-                            <input type="date" id="startDate" required>
+                            <label for="startDate">Start Date</label>
+                            <input type="date" id="startDate">
                         </div>
                         <div class="form-group">
-                            <label for="deadline">Deadline *</label>
-                            <input type="date" id="deadline" required>
+                            <label for="deadline">Deadline</label>
+                            <input type="date" id="deadline">
                         </div>
                     </div>
                     <div class="form-group">
@@ -1586,8 +1594,8 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="projectNotes">Notes</label>
-                        <textarea id="projectNotes" placeholder="Additional notes about this project..."></textarea>
+                        <label for="projectNotes">Notes *</label>
+                        <textarea id="projectNotes" placeholder="Additional notes about this project..." required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1655,8 +1663,8 @@
         // =====================
         // ⚠️ 请替换为您自己的 Supabase 项目配置
         // ⚠️ Replace with your own Supabase project configuration
-        const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';  // 例如: https://xxxxx.supabase.co
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // 从 Supabase 控制台获取
         
         // 检查配置
         const isConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
@@ -1715,6 +1723,7 @@
                     clientName: p.client_name,
                     clientEmail: p.client_email,
                     clientPhone: p.client_phone,
+                    clientWechat: p.client_wechat,
                     startDate: p.start_date,
                     deadline: p.deadline,
                     status: p.status,
@@ -1823,6 +1832,7 @@
                 projectInfo: 'Project Information',
                 projectType: 'Project Type',
                 clientEmail: 'Client Email',
+                wechat: 'WeChat',
                 phone: 'Phone',
                 targetUniversities: 'Target Universities',
                 notes: 'Notes',
@@ -1946,6 +1956,7 @@
                 projectInfo: '项目信息',
                 projectType: '项目类型',
                 clientEmail: '客户邮箱',
+                wechat: '微信',
                 phone: '电话',
                 targetUniversities: '目标院校',
                 notes: '备注',
@@ -2145,16 +2156,17 @@
             
             // Project modal
             document.querySelector('label[for="clientName"]').textContent = t('clientName') + ' *';
-            document.querySelector('label[for="clientEmail"]').textContent = t('clientEmail') + ' *';
-            document.querySelector('label[for="clientPhone"]').textContent = t('phoneNumber');
+            document.querySelector('label[for="clientEmail"]').textContent = t('clientEmail');
+            document.querySelector('label[for="clientWechat"]').textContent = t('wechat') + ' *';
+            document.querySelector('label[for="clientPhone"]').textContent = t('phone') + ' *';
             document.querySelector('label[for="assignedTo"]').textContent = t('assignedTo');
-            document.querySelector('label[for="startDate"]').textContent = t('startDate') + ' *';
-            document.querySelector('label[for="deadline"]').textContent = t('deadline') + ' *';
+            document.querySelector('label[for="startDate"]').textContent = t('startDate');
+            document.querySelector('label[for="deadline"]').textContent = t('deadline');
             document.querySelector('label[for="targetUniversities"]').textContent = t('targetUniversitiesLabel');
             document.getElementById('targetUniversities').placeholder = t('targetUniversitiesPlaceholder');
             document.querySelector('label[for="projectStatus"]').textContent = t('status');
             document.querySelector('label[for="applicationSeason"]').textContent = t('applicationSeason');
-            document.querySelector('label[for="projectNotes"]').textContent = t('notesLabel');
+            document.querySelector('label[for="projectNotes"]').textContent = t('notesLabel') + ' *';
             document.getElementById('projectNotes').placeholder = t('notesPlaceholder');
             document.querySelector('#projectModal .modal-footer .btn-secondary').textContent = t('cancel');
             document.querySelector('#projectModal .modal-footer .btn-primary').textContent = t('saveProject');
@@ -2628,7 +2640,8 @@
             currentProjectId = id;
 
             document.getElementById('detailClientName').textContent = project.clientName;
-            document.getElementById('detailEmail').textContent = project.clientEmail;
+            document.getElementById('detailEmail').textContent = project.clientEmail || '-';
+            document.getElementById('detailWechat').textContent = project.clientWechat || '-';
             document.getElementById('detailPhone').textContent = project.clientPhone || '-';
             document.getElementById('detailStartDate').textContent = formatDate(project.startDate);
             document.getElementById('detailDeadline').textContent = formatDate(project.deadline);
@@ -2645,14 +2658,15 @@
             
             // Update info labels
             const infoLabels = document.querySelectorAll('.detail-main .info-label');
-            if (infoLabels.length >= 6) {
+            if (infoLabels.length >= 7) {
                 infoLabels[0].textContent = t('projectType');
-                infoLabels[1].textContent = t('clientEmail');
+                infoLabels[1].textContent = t('wechat');
                 infoLabels[2].textContent = t('phone');
-                infoLabels[3].textContent = t('startDate');
-                infoLabels[4].textContent = t('deadline');
-                infoLabels[5].textContent = t('status');
-                infoLabels[6].textContent = t('assignedTo');
+                infoLabels[3].textContent = t('clientEmail');
+                infoLabels[4].textContent = t('startDate');
+                infoLabels[5].textContent = t('deadline');
+                infoLabels[6].textContent = t('status');
+                infoLabels[7].textContent = t('assignedTo');
             }
 
             // Universities
@@ -2705,11 +2719,12 @@
             document.getElementById('projectModalTitle').textContent = 'Edit Project';
             document.getElementById('projectId').value = project.id;
             document.getElementById('clientName').value = project.clientName;
-            document.getElementById('clientEmail').value = project.clientEmail;
+            document.getElementById('clientEmail').value = project.clientEmail || '';
+            document.getElementById('clientWechat').value = project.clientWechat || '';
             document.getElementById('clientPhone').value = project.clientPhone || '';
             document.getElementById('assignedTo').value = project.assignedTo || '';
-            document.getElementById('startDate').value = project.startDate;
-            document.getElementById('deadline').value = project.deadline;
+            document.getElementById('startDate').value = project.startDate || '';
+            document.getElementById('deadline').value = project.deadline || '';
             document.getElementById('targetUniversities').value = project.targetUniversities.join(', ');
             document.getElementById('projectStatus').value = project.status;
             document.getElementById('applicationSeason').value = project.applicationSeason || 'Fall 2025';
@@ -2766,11 +2781,12 @@
             
             const projectData = {
                 client_name: document.getElementById('clientName').value,
-                client_email: document.getElementById('clientEmail').value,
+                client_email: document.getElementById('clientEmail').value || null,
+                client_wechat: document.getElementById('clientWechat').value,
                 client_phone: document.getElementById('clientPhone').value,
                 assigned_to: document.getElementById('assignedTo').value || null,
-                start_date: document.getElementById('startDate').value,
-                deadline: document.getElementById('deadline').value,
+                start_date: document.getElementById('startDate').value || null,
+                deadline: document.getElementById('deadline').value || null,
                 project_types: projectTypes,
                 target_universities: document.getElementById('targetUniversities').value.split(',').map(u => u.trim()).filter(u => u),
                 status: document.getElementById('projectStatus').value,

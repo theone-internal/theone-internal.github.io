@@ -594,6 +594,41 @@
             color: var(--danger);
         }
 
+        .status-badge.invalid {
+            background: #E0E0E0;
+            color: #757575;
+        }
+
+        /* Invalid project row style */
+        .projects-table tr.invalid-row td {
+            background: #F5F5F5;
+            color: #9E9E9E;
+        }
+
+        .projects-table tr.invalid-row .client-name {
+            color: #9E9E9E;
+            text-decoration: line-through;
+        }
+
+        .status-badge.invalid {
+            background: #E0E0E0;
+            color: #757575;
+        }
+
+        /* Invalid project row styling */
+        .projects-table tr.invalid-row {
+            opacity: 0.5;
+            background: #F5F5F5;
+        }
+
+        .projects-table tr.invalid-row td {
+            color: #9E9E9E;
+        }
+
+        .projects-table tr.invalid-row:hover td {
+            background: #EEEEEE;
+        }
+
         /* Project Type Tags */
         .project-types {
             display: flex;
@@ -1518,9 +1553,8 @@
                             <tr>
                                 <th>Client</th>
                                 <th>Type</th>
-                                <th>Target Schools</th>
-                                <th>Start Date</th>
-                                <th>Deadline</th>
+                                <th>Priority</th>
+                                <th>Next Reminder</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -1563,11 +1597,18 @@
                                 <option value="pending">Pending</option>
                                 <option value="completed">Completed</option>
                                 <option value="urgent">Urgent</option>
+                                <option value="invalid">❌ Invalid</option>
                             </select>
                             <select class="filter-select" id="typeFilter" onchange="filterProjects()">
                                 <option value="">All Types</option>
                                 <option value="language">🌐 语言类</option>
                                 <option value="studyabroad">🎓 留学类</option>
+                            </select>
+                            <select class="filter-select manager-only" id="priorityFilter" onchange="filterProjects()">
+                                <option value="">All Priorities</option>
+                                <option value="high">🔴 重点客户</option>
+                                <option value="normal">🟡 普通客户</option>
+                                <option value="low">🟢 低优先级</option>
                             </select>
                             <select class="filter-select manager-only" id="assigneeFilter" onchange="filterProjects()">
                                 <option value="">All Assignees</option>
@@ -1579,10 +1620,9 @@
                             <tr>
                                 <th>Client</th>
                                 <th>Type</th>
-                                <th>Target Schools</th>
+                                <th>Priority</th>
                                 <th>Assigned To</th>
-                                <th>Start Date</th>
-                                <th>Deadline</th>
+                                <th>Next Reminder</th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>
@@ -1812,6 +1852,7 @@
                                 <option value="active">Active</option>
                                 <option value="urgent">Urgent</option>
                                 <option value="completed">Completed</option>
+                                <option value="invalid">❌ Invalid</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -1952,7 +1993,7 @@
         // ⚠️ Replace with your own Supabase project configuration
         const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
-        
+
         // 检查配置
         const isConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
         
@@ -2295,6 +2336,12 @@
                 searchClients: 'Search clients...',
                 allStatus: 'All Status',
                 allAssignees: 'All Assignees',
+                allPriorities: 'All Priorities',
+                invalid: 'Invalid',
+                invalidResources: 'Invalid Resources',
+                markInvalid: 'Mark as Invalid',
+                reassign: 'Reassign',
+                needReassign: 'Need Reassign',
                 
                 // Team Page
                 teamMembers: 'Team Members',
@@ -2449,6 +2496,12 @@
                 searchClients: '搜索客户...',
                 allStatus: '全部状态',
                 allAssignees: '全部负责人',
+                allPriorities: '全部优先级',
+                invalid: '无效',
+                invalidResources: '无效资源',
+                markInvalid: '标记无效',
+                reassign: '重新分配',
+                needReassign: '待分配',
                 
                 // Team Page
                 teamMembers: '团队成员',
@@ -2742,9 +2795,8 @@
                 recentTable.innerHTML = `
                     <th>${t('client')}</th>
                     <th>${t('type')}</th>
-                    <th>${t('targetSchools')}</th>
-                    <th>${t('startDate')}</th>
-                    <th>${t('deadline')}</th>
+                    <th>${t('priority')}</th>
+                    <th>${t('nextReminderDate')}</th>
                     <th>${t('status')}</th>
                     <th>${t('actions')}</th>`;
             }
@@ -2755,10 +2807,9 @@
                 allTable.innerHTML = `
                     <th>${t('client')}</th>
                     <th>${t('type')}</th>
-                    <th>${t('targetSchools')}</th>
+                    <th>${t('priority')}</th>
                     <th>${t('assignedTo')}</th>
-                    <th>${t('startDate')}</th>
-                    <th>${t('deadline')}</th>
+                    <th>${t('nextReminderDate')}</th>
                     <th>${t('status')}</th>
                     <th>${t('actions')}</th>`;
             }
@@ -2941,6 +2992,7 @@
             
             assignedToSelect.innerHTML = `<option value="">${t('unassigned')}</option>`;
             assigneeFilter.innerHTML = `<option value="">${t('allAssignees')}</option>`;
+            assigneeFilter.innerHTML += `<option value="unassigned">⚠️ ${t('unassigned')} (${t('needReassign')})</option>`;
             
             users.forEach(user => {
                 assignedToSelect.innerHTML += `<option value="${user.id}">${user.name}</option>`;
@@ -2985,7 +3037,8 @@
                 'active': t('active'),
                 'pending': t('pending'),
                 'completed': t('completed'),
-                'urgent': t('urgent')
+                'urgent': t('urgent'),
+                'invalid': t('invalid')
             };
             return statusMap[status] || status;
         }
@@ -3010,10 +3063,13 @@
 
         function renderRecentProjects() {
             const tbody = document.getElementById('recentProjectsBody');
-            const visibleProjects = getVisibleProjects().slice(0, 5);
+            // Filter out invalid projects from recent list
+            const visibleProjects = getVisibleProjects()
+                .filter(p => p.status !== 'invalid')
+                .slice(0, 5);
             
             if (visibleProjects.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--text-muted);">${t('noProjectsYet')}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">${t('noProjectsYet')}</td></tr>`;
                 return;
             }
 
@@ -3021,12 +3077,11 @@
                 <tr>
                     <td>
                         <div class="client-name">${project.clientName}</div>
-                        <div class="client-email">${project.clientEmail}</div>
+                        <div class="client-email">${project.clientWechat || project.clientPhone || ''}</div>
                     </td>
                     <td>${renderTypeTags(project.projectTypes)}</td>
-                    <td>${project.targetUniversities.slice(0, 2).join(', ')}${project.targetUniversities.length > 2 ? '...' : ''}</td>
-                    <td>${formatDate(project.startDate)}</td>
-                    <td>${formatDate(project.deadline)}</td>
+                    <td>${renderPriorityBadge(project.priority)}</td>
+                    <td>${formatDate(project.nextReminderDate)}</td>
                     <td><span class="status-badge ${project.status}">${getStatusText(project.status)}</span></td>
                     <td>
                         <div class="actions-cell">
@@ -3065,12 +3120,15 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
             const typeFilter = document.getElementById('typeFilter').value;
+            const priorityFilter = document.getElementById('priorityFilter')?.value || '';
             const assigneeFilter = document.getElementById('assigneeFilter').value;
 
             if (searchTerm) {
                 filteredProjects = filteredProjects.filter(p => 
                     p.clientName.toLowerCase().includes(searchTerm) ||
-                    p.clientEmail.toLowerCase().includes(searchTerm)
+                    (p.clientEmail && p.clientEmail.toLowerCase().includes(searchTerm)) ||
+                    (p.clientWechat && p.clientWechat.toLowerCase().includes(searchTerm)) ||
+                    (p.clientPhone && p.clientPhone.includes(searchTerm))
                 );
             }
 
@@ -3082,8 +3140,16 @@
                 filteredProjects = filteredProjects.filter(p => p.projectTypes && p.projectTypes.includes(typeFilter));
             }
 
+            if (priorityFilter) {
+                filteredProjects = filteredProjects.filter(p => p.priority === priorityFilter);
+            }
+
             if (assigneeFilter) {
-                filteredProjects = filteredProjects.filter(p => p.assignedTo === parseInt(assigneeFilter));
+                if (assigneeFilter === 'unassigned') {
+                    filteredProjects = filteredProjects.filter(p => !p.assignedTo);
+                } else {
+                    filteredProjects = filteredProjects.filter(p => p.assignedTo === assigneeFilter);
+                }
             }
 
             if (filteredProjects.length === 0) {
@@ -3094,16 +3160,15 @@
 
             emptyState.classList.add('hidden');
             tbody.innerHTML = filteredProjects.map(project => `
-                <tr>
+                <tr class="${project.status === 'invalid' ? 'invalid-row' : ''}">
                     <td>
                         <div class="client-name">${project.clientName}</div>
-                        <div class="client-email">${project.clientEmail}</div>
+                        <div class="client-email">${project.clientWechat || project.clientPhone || project.clientEmail || ''}</div>
                     </td>
                     <td>${renderTypeTags(project.projectTypes)}</td>
-                    <td>${project.targetUniversities.slice(0, 2).join(', ')}${project.targetUniversities.length > 2 ? ' +' + (project.targetUniversities.length - 2) : ''}</td>
+                    <td>${renderPriorityBadge(project.priority)}</td>
                     <td>${getUserName(project.assignedTo)}</td>
-                    <td>${formatDate(project.startDate)}</td>
-                    <td>${formatDate(project.deadline)}</td>
+                    <td>${formatDate(project.nextReminderDate)}</td>
                     <td><span class="status-badge ${project.status}">${getStatusText(project.status)}</span></td>
                     <td>
                         <div class="actions-cell">
@@ -3120,6 +3185,24 @@
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
                             </button>
+                            ${project.status !== 'invalid' ? `
+                            <button class="action-btn" onclick="markProjectInvalid(${project.id})" title="Mark Invalid">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </button>
+                            ` : `
+                            <button class="action-btn" onclick="reassignProject(${project.id})" title="Reassign">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                    <path d="M3 3v5h5"></path>
+                                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                                    <path d="M16 21h5v-5"></path>
+                                </svg>
+                            </button>
+                            `}
                             <button class="action-btn delete" onclick="deleteProject(${project.id})" title="Delete">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="3 6 5 6 21 6"></polyline>
@@ -3131,6 +3214,47 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function renderPriorityBadge(priority) {
+            const badges = {
+                high: '<span class="priority-badge vip">🔴 重点</span>',
+                normal: '<span class="priority-badge normal">🟡 普通</span>',
+                low: '<span class="priority-badge low">🟢 低</span>'
+            };
+            return badges[priority] || badges.normal;
+        }
+
+        async function markProjectInvalid(id) {
+            if (!confirm('确定将此资源标记为无效吗？资源将回到管理者名下等待重新分配。')) return;
+            
+            try {
+                const { error } = await db
+                    .from('projects')
+                    .update({ 
+                        status: 'invalid',
+                        assigned_to: null  // 回到未分配状态
+                    })
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                await updateUI();
+                showToast('资源已标记为无效');
+            } catch (err) {
+                console.error('Error marking invalid:', err);
+                alert(err.message);
+            }
+        }
+
+        async function reassignProject(id) {
+            // 打开编辑弹窗让管理者重新分配
+            const project = projects.find(p => p.id === id);
+            if (project) {
+                editProject(id);
+                // 自动将状态改为 pending
+                document.getElementById('projectStatus').value = 'pending';
+            }
         }
 
         function renderTeam() {
@@ -3657,3 +3781,4 @@
 </body>
 </html>
 
+        

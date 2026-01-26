@@ -1867,17 +1867,12 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="applicationSeason">申请季</label>
-                            <div class="season-picker" style="display: flex; gap: 12px;">
-                                <select id="applicationSeasonTerm" style="flex: 1;">
-                                    <option value="Spring">春季 Spring</option>
-                                    <option value="Fall" selected>秋季 Fall</option>
-                                    <option value="Summer">夏季 Summer</option>
-                                    <option value="Winter">冬季 Winter</option>
-                                </select>
-                                <select id="applicationSeasonYear" style="flex: 1;">
-                                </select>
-                            </div>
-                            <input type="hidden" id="applicationSeason">
+                            <select id="applicationSeason">
+                                <option value="Fall 2025">2025秋季</option>
+                                <option value="Spring 2025">2025春季</option>
+                                <option value="Fall 2026">2026秋季</option>
+                                <option value="Spring 2026">2026春季</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="nextFollowupDate">下次提醒日期</label>
@@ -2000,8 +1995,9 @@
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
 
         // 检查配置
-        const isConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
-        
+        const isConfigured = SUPABASE_URL !== 'https://quzcctbipfyhogtcoyoi.supabase.co' && 
+        SUPABASE_ANON_KEY !== 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
+
         // 初始化 Supabase 客户端
         let db = null;
         if (isConfigured) {
@@ -2723,16 +2719,6 @@
                 <option value="">${t('allTypes')}</option>
                 <option value="language">🌐 ${t('language')}</option>
                 <option value="studyabroad">🎓 ${t('studyAbroad')}</option>`;
-
-            // Priority filter - 添加这部分
-            const priorityFilter = document.getElementById('priorityFilter');
-            if (priorityFilter) {
-                priorityFilter.innerHTML = `
-                    <option value="">${t('allPriorities')}</option>
-                    <option value="vip">${t('priorityHigh')}</option>
-                    <option value="normal">${t('priorityNormal')}</option>
-                    <option value="low">${t('priorityLow')}</option>`;
-            }
             
             // Empty state
             document.querySelector('#emptyState h4').textContent = t('noProjectsFound');
@@ -3411,8 +3397,7 @@
             document.getElementById('projectStatus').value = project.status;
             document.getElementById('projectPriority').value = project.priority || 'normal';
             document.getElementById('nextFollowupDate').value = project.nextReminderDate || '';
-            initSeasonPicker();
-            setSeasonPickerValue(project.applicationSeason || 'Fall 2026');
+            document.getElementById('applicationSeason').value = project.applicationSeason || 'Fall 2025';
             document.getElementById('projectNotes').value = project.notes || '';
             
             // Set project types
@@ -3468,11 +3453,44 @@
             const status = document.getElementById('projectStatus').value;
             const assignedTo = status === 'invalid' ? null : (document.getElementById('assignedTo').value || null);
             
+            const clientWechat = document.getElementById('clientWechat').value.trim();
+            const clientPhone = document.getElementById('clientPhone').value.trim();
+            
+            // 检查微信号和手机号是否已存在
+            const duplicateErrors = [];
+            
+            if (clientWechat) {
+                const existingWechat = projects.find(p => 
+                    p.clientWechat && 
+                    p.clientWechat.toLowerCase() === clientWechat.toLowerCase() && 
+                    p.id != id
+                );
+                if (existingWechat) {
+                    duplicateErrors.push(`微信号 "${clientWechat}" 已被学员 "${existingWechat.clientName}" 使用`);
+                }
+            }
+            
+            if (clientPhone) {
+                const existingPhone = projects.find(p => 
+                    p.clientPhone && 
+                    p.clientPhone === clientPhone && 
+                    p.id != id
+                );
+                if (existingPhone) {
+                    duplicateErrors.push(`手机号 "${clientPhone}" 已被学员 "${existingPhone.clientName}" 使用`);
+                }
+            }
+            
+            if (duplicateErrors.length > 0) {
+                alert('⚠️ 重复警告：\n\n' + duplicateErrors.join('\n\n') + '\n\n请确认信息是否正确。');
+                return;
+            }
+            
             const projectData = {
                 client_name: document.getElementById('clientName').value,
                 client_email: document.getElementById('clientEmail').value || null,
-                client_wechat: document.getElementById('clientWechat').value,
-                client_phone: document.getElementById('clientPhone').value,
+                client_wechat: clientWechat,
+                client_phone: clientPhone,
                 assigned_to: assignedTo,
                 start_date: document.getElementById('startDate').value || null,
                 deadline: document.getElementById('deadline').value || null,
@@ -3623,13 +3641,11 @@
                 document.getElementById('typeStudyAbroad').checked = false;
                 document.getElementById('languageCheckbox').classList.remove('checked');
                 document.getElementById('studyabroadCheckbox').classList.remove('checked');
-                initSeasonPicker();
                 document.getElementById('projectModal').classList.add('active');
             } else if (type === 'addUser') {
                 document.getElementById('userForm').reset();
                 document.getElementById('userModal').classList.add('active');
             } else if (type === 'projectModal') {
-                initSeasonPicker();
                 document.getElementById('projectModal').classList.add('active');
             }
         }
@@ -3674,58 +3690,6 @@
             document.getElementById('toastMessage').textContent = message;
             toast.classList.add('active');
             setTimeout(() => toast.classList.remove('active'), 3000);
-        }
-
-        // =====================
-        // APPLICATION SEASON PICKER
-        // =====================
-        function initSeasonPicker() {
-            const yearSelect = document.getElementById('applicationSeasonYear');
-            const currentYear = new Date().getFullYear();
-            
-            // 生成年份选项：当前年份 -1 到 +5
-            yearSelect.innerHTML = '';
-            for (let year = currentYear - 1; year <= currentYear + 5; year++) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year + '年';
-                if (year === currentYear + 1) option.selected = true;
-                yearSelect.appendChild(option);
-            }
-            
-            // 监听变化
-            document.getElementById('applicationSeasonTerm').addEventListener('change', updateSeasonValue);
-            document.getElementById('applicationSeasonYear').addEventListener('change', updateSeasonValue);
-            updateSeasonValue();
-        }
-
-        function updateSeasonValue() {
-            const term = document.getElementById('applicationSeasonTerm').value;
-            const year = document.getElementById('applicationSeasonYear').value;
-            document.getElementById('applicationSeason').value = `${term} ${year}`;
-        }
-
-        function setSeasonPickerValue(seasonStr) {
-            if (!seasonStr) return;
-            
-            const termSelect = document.getElementById('applicationSeasonTerm');
-            const yearSelect = document.getElementById('applicationSeasonYear');
-            
-            // 匹配 "Fall 2025" 格式
-            const match = seasonStr.match(/(Spring|Fall|Summer|Winter)\s*(\d{4})/i);
-            if (match) {
-                termSelect.value = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
-                const year = match[2];
-                // 确保年份存在
-                if (!yearSelect.querySelector(`option[value="${year}"]`)) {
-                    const opt = document.createElement('option');
-                    opt.value = year;
-                    opt.textContent = year + '年';
-                    yearSelect.appendChild(opt);
-                }
-                yearSelect.value = year;
-            }
-            updateSeasonValue();
         }
 
         // =====================

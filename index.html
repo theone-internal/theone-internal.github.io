@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ApplyPath — University Application Management</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
@@ -1379,6 +1380,79 @@
             color: white;
         }
 
+        /* Import Modal Styles */
+        .import-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .import-upload-area:hover,
+        .import-upload-area.dragover {
+            border-color: var(--accent-primary);
+            background: var(--accent-light);
+        }
+
+        .import-preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .import-preview-table th {
+            background: var(--bg-accent);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: var(--text-secondary);
+            position: sticky;
+            top: 0;
+        }
+
+        .import-preview-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .import-preview-table tr:hover td {
+            background: var(--bg-primary);
+        }
+
+        .import-preview-table tr.invalid-row td {
+            background: var(--danger-light);
+        }
+
+        .import-progress-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .import-preview-table code {
+            background: var(--bg-accent);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
         /* Manager-only elements */
         .manager-only {
             display: none;
@@ -1609,6 +1683,14 @@
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
                             批量分配 (<span id="selectedCount">0</span>)
+                        </button>
+                        <button class="btn btn-secondary" onclick="openImportModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            批量导入
                         </button>
                         <button class="btn btn-primary" onclick="openModal('addProject')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
@@ -1978,6 +2060,98 @@
                     <button type="submit" class="btn btn-primary">添加成员</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Import Students Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3>批量导入学员</h3>
+                <button class="modal-close" onclick="closeModal('importModal')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Step 1: Upload -->
+                <div id="importStep1">
+                    <div class="import-upload-area" id="importDropZone">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48" style="color: var(--text-muted); margin-bottom: 16px;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">拖放文件到此处，或点击选择</p>
+                        <p style="font-size: 13px; color: var(--text-muted);">支持 CSV、Excel (.xlsx, .xls) 格式</p>
+                        <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                    </div>
+                    <div class="import-template-hint" style="margin-top: 16px; padding: 16px; background: var(--bg-accent); border-radius: var(--radius-md);">
+                        <p style="font-size: 13px; margin: 0 0 8px 0;"><strong>📋 文件格式要求：</strong></p>
+                        <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">
+                            必需列：<code>学生姓名</code>、<code>学生电话</code> 或 <code>学生微信</code><br>
+                            可选列：<code>日期</code>、<code>渠道</code>、<code>意向国家</code>、<code>资源基础情况</code>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Preview -->
+                <div id="importStep2" style="display: none;">
+                    <div class="import-preview-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <span style="font-weight: 600;">预览数据</span>
+                            <span id="importPreviewCount" style="color: var(--text-muted); margin-left: 8px;"></span>
+                        </div>
+                        <button class="btn btn-ghost" onclick="resetImport()">重新选择文件</button>
+                    </div>
+                    <div class="import-preview-table-wrapper" style="max-height: 400px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+                        <table class="import-preview-table" id="importPreviewTable">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="import-options" style="margin-top: 16px; padding: 16px; background: var(--bg-accent); border-radius: var(--radius-md);">
+                        <div class="form-row">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="importAssignTo">分配给（可选）</label>
+                                <select id="importAssignTo">
+                                    <option value="">暂不分配</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="importDefaultStatus">默认状态</label>
+                                <select id="importDefaultStatus">
+                                    <option value="pending">待处理</option>
+                                    <option value="active">进行中</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label for="importDefaultPriority">默认优先级</label>
+                                <select id="importDefaultPriority">
+                                    <option value="normal">🟡 普通客户</option>
+                                    <option value="vip">🔴 重点客户</option>
+                                    <option value="low">🟢 低优先级</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="importErrors" style="display: none; margin-top: 16px; padding: 12px; background: var(--danger-light); border-radius: var(--radius-md); color: var(--danger); font-size: 13px;">
+                    </div>
+                </div>
+                
+                <!-- Step 3: Progress -->
+                <div id="importStep3" style="display: none; text-align: center; padding: 40px;">
+                    <div class="import-progress-spinner"></div>
+                    <p style="margin-top: 20px; font-weight: 500;">正在导入...</p>
+                    <p id="importProgressText" style="color: var(--text-muted); font-size: 14px;">0 / 0</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
+                <button type="button" class="btn btn-primary" id="importConfirmBtn" onclick="executeImport()" disabled>确认导入</button>
+            </div>
         </div>
     </div>
 
@@ -3456,6 +3630,322 @@
             }
         }
 
+        // =====================
+        // BATCH IMPORT
+        // =====================
+        let importData = [];
+        let importHeaders = [];
+
+        function openImportModal() {
+            resetImport();
+            
+            // Populate assignee dropdown
+            const importAssignTo = document.getElementById('importAssignTo');
+            importAssignTo.innerHTML = '<option value="">暂不分配</option>';
+            users.forEach(user => {
+                importAssignTo.innerHTML += `<option value="${user.id}">${user.name}</option>`;
+            });
+            
+            document.getElementById('importModal').classList.add('active');
+            
+            // Setup drag and drop
+            const dropZone = document.getElementById('importDropZone');
+            const fileInput = document.getElementById('importFileInput');
+            
+            dropZone.onclick = () => fileInput.click();
+            
+            dropZone.ondragover = (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            };
+            
+            dropZone.ondragleave = () => {
+                dropZone.classList.remove('dragover');
+            };
+            
+            dropZone.ondrop = (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processImportFile(files[0]);
+                }
+            };
+        }
+
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processImportFile(file);
+            }
+        }
+
+        function processImportFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                    
+                    // Get first sheet
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    
+                    // Convert to JSON
+                    const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                    
+                    if (jsonData.length < 2) {
+                        alert('文件为空或格式不正确');
+                        return;
+                    }
+                    
+                    // First row is headers
+                    importHeaders = jsonData[0].map(h => String(h || '').trim());
+                    
+                    // Rest is data
+                    importData = jsonData.slice(1).filter(row => row.some(cell => cell !== null && cell !== ''));
+                    
+                    // Show preview
+                    showImportPreview();
+                    
+                } catch (err) {
+                    console.error('Error parsing file:', err);
+                    alert('文件解析失败: ' + err.message);
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showImportPreview() {
+            document.getElementById('importStep1').style.display = 'none';
+            document.getElementById('importStep2').style.display = 'block';
+            document.getElementById('importConfirmBtn').disabled = false;
+            
+            // Find column mappings
+            const colMap = {
+                name: findColumnIndex(['学生姓名', '姓名', '名字', 'name']),
+                phone: findColumnIndex(['学生电话', '电话', '手机', 'phone', 'tel']),
+                wechat: findColumnIndex(['学生微信', '微信', 'wechat']),
+                channel: findColumnIndex(['渠道', '来源', 'channel', 'source']),
+                country: findColumnIndex(['意向国家', '国家', '目标国家', 'country']),
+                notes: findColumnIndex(['资源基础情况', '备注', '详情', 'notes', 'info']),
+                date: findColumnIndex(['日期', '时间', 'date'])
+            };
+            
+            // Validate required columns
+            let errors = [];
+            if (colMap.name === -1) {
+                errors.push('缺少必需列：学生姓名');
+            }
+            if (colMap.phone === -1 && colMap.wechat === -1) {
+                errors.push('缺少联系方式：需要"学生电话"或"学生微信"列');
+            }
+            
+            const errorsDiv = document.getElementById('importErrors');
+            if (errors.length > 0) {
+                errorsDiv.style.display = 'block';
+                errorsDiv.innerHTML = '⚠️ ' + errors.join('<br>⚠️ ');
+                document.getElementById('importConfirmBtn').disabled = true;
+            } else {
+                errorsDiv.style.display = 'none';
+            }
+            
+            // Build preview table
+            const thead = document.querySelector('#importPreviewTable thead');
+            const tbody = document.querySelector('#importPreviewTable tbody');
+            
+            // Headers - show relevant columns
+            const displayCols = ['学生姓名', '学生电话', '学生微信', '渠道', '意向国家', '资源基础情况'];
+            const displayColIndexes = displayCols.map(col => findColumnIndex([col]));
+            
+            thead.innerHTML = '<tr>' + displayCols.map(col => `<th>${col}</th>`).join('') + '</tr>';
+            
+            // Data rows
+            let validCount = 0;
+            let invalidCount = 0;
+            
+            tbody.innerHTML = importData.slice(0, 50).map((row, idx) => {
+                const name = colMap.name >= 0 ? getCellValue(row[colMap.name]) : '';
+                const phone = colMap.phone >= 0 ? getCellValue(row[colMap.phone]) : '';
+                const wechat = colMap.wechat >= 0 ? getCellValue(row[colMap.wechat]) : '';
+                
+                const isValid = name && (phone || wechat);
+                if (isValid) validCount++;
+                else invalidCount++;
+                
+                return `<tr class="${isValid ? '' : 'invalid-row'}">
+                    ${displayColIndexes.map(colIdx => {
+                        const val = colIdx >= 0 && row[colIdx] !== undefined ? getCellValue(row[colIdx]) : '-';
+                        return `<td title="${val}">${val}</td>`;
+                    }).join('')}
+                </tr>`;
+            }).join('');
+            
+            // Update count
+            const totalRows = importData.length;
+            document.getElementById('importPreviewCount').textContent = 
+                `共 ${totalRows} 条记录` + 
+                (totalRows > 50 ? `（显示前50条）` : '') +
+                (invalidCount > 0 ? `，${invalidCount} 条数据不完整` : '');
+            
+            // Store column mapping for later use
+            window.importColMap = colMap;
+        }
+
+        function findColumnIndex(possibleNames) {
+            for (let name of possibleNames) {
+                const idx = importHeaders.findIndex(h => 
+                    h.toLowerCase().includes(name.toLowerCase())
+                );
+                if (idx >= 0) return idx;
+            }
+            return -1;
+        }
+
+        function getCellValue(cell) {
+            if (cell === null || cell === undefined) return '';
+            if (cell instanceof Date) {
+                return cell.toLocaleDateString('zh-CN');
+            }
+            return String(cell).trim();
+        }
+
+        function resetImport() {
+            importData = [];
+            importHeaders = [];
+            document.getElementById('importStep1').style.display = 'block';
+            document.getElementById('importStep2').style.display = 'none';
+            document.getElementById('importStep3').style.display = 'none';
+            document.getElementById('importConfirmBtn').disabled = true;
+            document.getElementById('importFileInput').value = '';
+            document.getElementById('importErrors').style.display = 'none';
+        }
+
+        async function executeImport() {
+            const colMap = window.importColMap;
+            if (!colMap) return;
+            
+            const assignTo = document.getElementById('importAssignTo').value || null;
+            const defaultStatus = document.getElementById('importDefaultStatus').value;
+            const defaultPriority = document.getElementById('importDefaultPriority').value;
+            
+            // Filter valid rows
+            const validRows = importData.filter(row => {
+                const name = colMap.name >= 0 ? getCellValue(row[colMap.name]) : '';
+                const phone = colMap.phone >= 0 ? getCellValue(row[colMap.phone]) : '';
+                const wechat = colMap.wechat >= 0 ? getCellValue(row[colMap.wechat]) : '';
+                return name && (phone || wechat);
+            });
+            
+            if (validRows.length === 0) {
+                alert('没有有效的数据可导入');
+                return;
+            }
+            
+            if (!confirm(`确定导入 ${validRows.length} 条学员数据吗？`)) {
+                return;
+            }
+            
+            // Show progress
+            document.getElementById('importStep2').style.display = 'none';
+            document.getElementById('importStep3').style.display = 'block';
+            document.querySelector('.modal-footer').style.display = 'none';
+            
+            let successCount = 0;
+            let failCount = 0;
+            const progressText = document.getElementById('importProgressText');
+            
+            // Check for duplicates and prepare data
+            const projectsToInsert = [];
+            const duplicates = [];
+            
+            for (let i = 0; i < validRows.length; i++) {
+                const row = validRows[i];
+                progressText.textContent = `检查数据 ${i + 1} / ${validRows.length}`;
+                
+                const name = colMap.name >= 0 ? getCellValue(row[colMap.name]) : '';
+                const phone = colMap.phone >= 0 ? getCellValue(row[colMap.phone]) : '';
+                const wechat = colMap.wechat >= 0 ? getCellValue(row[colMap.wechat]) : '';
+                const channel = colMap.channel >= 0 ? getCellValue(row[colMap.channel]) : '';
+                const country = colMap.country >= 0 ? getCellValue(row[colMap.country]) : '';
+                const notes = colMap.notes >= 0 ? getCellValue(row[colMap.notes]) : '';
+                
+                // Check for duplicates
+                const existingByWechat = wechat ? projects.find(p => p.clientWechat && p.clientWechat.toLowerCase() === wechat.toLowerCase()) : null;
+                const existingByPhone = phone ? projects.find(p => p.clientPhone && p.clientPhone === phone) : null;
+                
+                if (existingByWechat || existingByPhone) {
+                    duplicates.push({
+                        name,
+                        reason: existingByWechat ? `微信号已存在 (${existingByWechat.clientName})` : `电话已存在 (${existingByPhone.clientName})`
+                    });
+                    continue;
+                }
+                
+                // Build notes with channel and country info
+                let fullNotes = notes;
+                if (channel || country) {
+                    const extra = [];
+                    if (channel) extra.push(`渠道: ${channel}`);
+                    if (country) extra.push(`意向国家: ${country}`);
+                    fullNotes = extra.join(' | ') + (fullNotes ? '\n\n' + fullNotes : '');
+                }
+                
+                projectsToInsert.push({
+                    client_name: name,
+                    client_phone: phone || null,
+                    client_wechat: wechat || null,
+                    assigned_to: assignTo,
+                    status: defaultStatus,
+                    priority: defaultPriority,
+                    reminder_days: defaultPriority === 'vip' ? 1 : (defaultPriority === 'low' ? 14 : 7),
+                    next_reminder_date: new Date().toISOString().split('T')[0],
+                    notes: fullNotes || null,
+                    project_types: ['studyabroad']
+                });
+            }
+            
+            // Insert in batches
+            const batchSize = 20;
+            for (let i = 0; i < projectsToInsert.length; i += batchSize) {
+                const batch = projectsToInsert.slice(i, i + batchSize);
+                progressText.textContent = `导入中 ${Math.min(i + batchSize, projectsToInsert.length)} / ${projectsToInsert.length}`;
+                
+                try {
+                    const { error } = await db
+                        .from('projects')
+                        .insert(batch);
+                    
+                    if (error) throw error;
+                    successCount += batch.length;
+                } catch (err) {
+                    console.error('Import batch error:', err);
+                    failCount += batch.length;
+                }
+                
+                // Small delay to avoid rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // Show results
+            closeModal('importModal');
+            document.querySelector('.modal-footer').style.display = 'flex';
+            
+            let message = `导入完成！成功 ${successCount} 条`;
+            if (failCount > 0) {
+                message += `，失败 ${failCount} 条`;
+            }
+            if (duplicates.length > 0) {
+                message += `，跳过重复 ${duplicates.length} 条`;
+                console.log('Skipped duplicates:', duplicates);
+            }
+            
+            showToast(message);
+            await updateUI();
+        }
+
         async function markProjectInvalid(id) {
             if (!confirm('确定将此资源标记为无效吗？资源将回到管理者名下等待重新分配。')) return;
             
@@ -4041,4 +4531,5 @@
     </script>
 </body>
 </html>
+
 

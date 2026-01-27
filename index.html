@@ -1348,6 +1348,37 @@
             background: var(--accent-secondary);
         }
 
+        /* Batch Selection Checkbox */
+        .project-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent-primary);
+        }
+
+        #selectAllProjects {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--accent-primary);
+        }
+
+        .projects-table th:first-child,
+        .projects-table td:first-child {
+            text-align: center;
+        }
+
+        #batchAssignBtn {
+            background: var(--accent-light);
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+        }
+
+        #batchAssignBtn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
         /* Manager-only elements */
         .manager-only {
             display: none;
@@ -1570,6 +1601,15 @@
                 <div class="page-header">
                     <h1>全部项目</h1>
                     <div class="page-header-actions manager-only">
+                        <button class="btn btn-secondary" id="batchAssignBtn" style="display: none;" onclick="openBatchAssignModal()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            批量分配 (<span id="selectedCount">0</span>)
+                        </button>
                         <button class="btn btn-primary" onclick="openModal('addProject')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
                                 <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -1618,6 +1658,9 @@
                     <table class="projects-table">
                         <thead>
                             <tr>
+                                <th class="manager-only" style="width: 40px;">
+                                    <input type="checkbox" id="selectAllProjects" onchange="toggleSelectAll()" title="全选">
+                                </th>
                                 <th>客户</th>
                                 <th>类型</th>
                                 <th>优先级</th>
@@ -1938,6 +1981,50 @@
         </div>
     </div>
 
+    <!-- Batch Assign Modal -->
+    <div class="modal-overlay" id="batchAssignModal">
+        <div class="modal" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>批量分配学员</h3>
+                <button class="modal-close" onclick="closeModal('batchAssignModal')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <form id="batchAssignForm" onsubmit="executeBatchAssign(event)">
+                <div class="modal-body">
+                    <div class="batch-assign-info" style="background: var(--bg-accent); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px;">
+                        <p style="margin: 0; font-size: 14px;">
+                            <strong>已选择 <span id="batchSelectedCount">0</span> 个学员</strong>
+                        </p>
+                        <div id="batchSelectedList" style="margin-top: 12px; max-height: 150px; overflow-y: auto; font-size: 13px; color: var(--text-secondary);">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchAssignTo">分配给 *</label>
+                        <select id="batchAssignTo" required>
+                            <option value="">-- 请选择顾问 --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="batchStatus">同时更新状态为</label>
+                        <select id="batchStatus">
+                            <option value="">不更改状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="active">进行中</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('batchAssignModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">确认分配</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Add Follow-up Modal -->
     <div class="modal-overlay" id="followUpModal">
         <div class="modal">
@@ -1989,14 +2076,12 @@
         // =====================
         // SUPABASE CONFIGURATION
         // =====================
-        // ⚠️ 请替换为您自己的 Supabase 项目配置
-        // ⚠️ Replace with your own Supabase project configuration
         const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
 
-        // 检查配置
-        const isConfigured = SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY';
-
+        // 配置已设置
+        const isConfigured = true;
+        
         // 初始化 Supabase 客户端
         let db = null;
         if (isConfigured) {
@@ -3161,6 +3246,11 @@
             emptyState.classList.add('hidden');
             tbody.innerHTML = filteredProjects.map(project => `
                 <tr class="${project.status === 'invalid' ? 'invalid-row' : ''}">
+                    ${isManager() ? `
+                    <td>
+                        <input type="checkbox" class="project-checkbox" value="${project.id}" onchange="updateBatchSelection()">
+                    </td>
+                    ` : ''}
                     <td>
                         <div class="client-name">${project.clientName}</div>
                         <div class="client-email">${project.clientWechat || project.clientPhone || project.clientEmail || ''}</div>
@@ -3214,6 +3304,13 @@
                     </td>
                 </tr>
             `).join('');
+            
+            // Reset select all checkbox
+            const selectAllCheckbox = document.getElementById('selectAllProjects');
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+            }
+            updateBatchSelection();
         }
 
         function renderPriorityBadge(priority) {
@@ -3223,6 +3320,140 @@
                 low: '<span class="priority-badge low">🟢 低</span>'
             };
             return badges[priority] || badges.normal;
+        }
+
+        // =====================
+        // BATCH ASSIGNMENT
+        // =====================
+        let selectedProjectIds = [];
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAllProjects');
+            const checkboxes = document.querySelectorAll('.project-checkbox');
+            
+            checkboxes.forEach(cb => {
+                cb.checked = selectAllCheckbox.checked;
+            });
+            
+            updateBatchSelection();
+        }
+
+        function updateBatchSelection() {
+            const checkboxes = document.querySelectorAll('.project-checkbox:checked');
+            selectedProjectIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+            
+            const count = selectedProjectIds.length;
+            const batchBtn = document.getElementById('batchAssignBtn');
+            const selectedCountSpan = document.getElementById('selectedCount');
+            
+            if (batchBtn) {
+                if (count > 0) {
+                    batchBtn.style.display = 'inline-flex';
+                    selectedCountSpan.textContent = count;
+                } else {
+                    batchBtn.style.display = 'none';
+                }
+            }
+            
+            // Update select all checkbox state
+            const allCheckboxes = document.querySelectorAll('.project-checkbox');
+            const selectAllCheckbox = document.getElementById('selectAllProjects');
+            if (selectAllCheckbox && allCheckboxes.length > 0) {
+                selectAllCheckbox.checked = checkboxes.length === allCheckboxes.length;
+                selectAllCheckbox.indeterminate = checkboxes.length > 0 && checkboxes.length < allCheckboxes.length;
+            }
+        }
+
+        function openBatchAssignModal() {
+            if (selectedProjectIds.length === 0) {
+                alert('请先选择要分配的学员');
+                return;
+            }
+            
+            // Populate consultant dropdown
+            const batchAssignTo = document.getElementById('batchAssignTo');
+            batchAssignTo.innerHTML = '<option value="">-- 请选择顾问 --</option>';
+            users.forEach(user => {
+                batchAssignTo.innerHTML += `<option value="${user.id}">${user.name} (${getRoleText(user.role)})</option>`;
+            });
+            
+            // Update selected count and list
+            document.getElementById('batchSelectedCount').textContent = selectedProjectIds.length;
+            
+            // Show selected project names
+            const selectedList = document.getElementById('batchSelectedList');
+            const selectedProjects = projects.filter(p => selectedProjectIds.includes(p.id));
+            selectedList.innerHTML = selectedProjects.map(p => 
+                `<div style="padding: 4px 0; border-bottom: 1px solid var(--border-color);">
+                    ${p.clientName} <span style="color: var(--text-muted);">(${p.clientWechat || p.clientPhone || ''})</span>
+                </div>`
+            ).join('');
+            
+            // Reset form
+            document.getElementById('batchStatus').value = '';
+            
+            document.getElementById('batchAssignModal').classList.add('active');
+        }
+
+        async function executeBatchAssign(e) {
+            e.preventDefault();
+            
+            const assignTo = document.getElementById('batchAssignTo').value;
+            const newStatus = document.getElementById('batchStatus').value;
+            
+            if (!assignTo) {
+                alert('请选择要分配给的顾问');
+                return;
+            }
+            
+            if (selectedProjectIds.length === 0) {
+                alert('没有选中的学员');
+                return;
+            }
+            
+            const assigneeName = users.find(u => u.id === assignTo)?.name || '';
+            
+            if (!confirm(`确定将 ${selectedProjectIds.length} 个学员分配给 ${assigneeName} 吗？`)) {
+                return;
+            }
+            
+            try {
+                // Build update object
+                const updateData = { assigned_to: assignTo };
+                if (newStatus) {
+                    updateData.status = newStatus;
+                }
+                
+                // Update all selected projects
+                const { error } = await db
+                    .from('projects')
+                    .update(updateData)
+                    .in('id', selectedProjectIds);
+                
+                if (error) throw error;
+                
+                // Add activity log for each project
+                const activityPromises = selectedProjectIds.map(projectId => 
+                    db.from('activities').insert({
+                        project_id: projectId,
+                        description: `批量分配给 ${assigneeName}`
+                    })
+                );
+                await Promise.all(activityPromises);
+                
+                closeModal('batchAssignModal');
+                showToast(`成功分配 ${selectedProjectIds.length} 个学员给 ${assigneeName}`);
+                
+                // Reset selection
+                selectedProjectIds = [];
+                
+                // Refresh UI
+                await updateUI();
+                
+            } catch (err) {
+                console.error('Batch assign error:', err);
+                alert('批量分配失败: ' + err.message);
+            }
         }
 
         async function markProjectInvalid(id) {
@@ -3763,13 +3994,6 @@
         (async function init() {
             updateLangButtons();
             updateAllText();
-            
-            // Check if Supabase is configured
-            if (!isConfigured) {
-                alert('⚠️ 请先配置 Supabase!\n\n1. 打开 index.html\n2. 找到 SUPABASE_URL 和 SUPABASE_ANON_KEY\n3. 替换为您的 Supabase 项目配置\n\nPlease configure Supabase first!');
-                showLoginForm();
-                return;
-            }
             
             if (!db) {
                 console.error('Supabase client not initialized');

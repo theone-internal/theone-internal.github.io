@@ -1841,8 +1841,16 @@
                                 <span class="info-value" id="detailEmail">-</span>
                             </div>
                             <div class="info-row">
-                                <span class="info-label">开始日期</span>
+                                <span class="info-label">录入日期</span>
                                 <span class="info-value" id="detailStartDate">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">下次提醒</span>
+                                <span class="info-value" id="detailNextReminder">-</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">最后联系</span>
+                                <span class="info-value" id="detailLastContact">-</span>
                             </div>
                             <div class="info-row">
                                 <span class="info-label">截止日期</span>
@@ -1957,8 +1965,13 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="startDate">开始日期</label>
-                            <input type="date" id="startDate">
+                            <label for="startDate">录入日期</label>
+                            <input type="date" id="startDate" readonly style="background: var(--bg-accent);">
+                        </div>
+                        <div class="form-group">
+                            <label for="nextFollowupDate">下次提醒日期</label>
+                            <input type="date" id="nextFollowupDate">
+                            <small id="reminderHint" style="display: block; margin-top: 4px; font-size: 11px; color: var(--text-muted);"></small>
                         </div>
                         <div class="form-group">
                             <label for="deadline">截止日期</label>
@@ -1989,20 +2002,14 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="applicationSeason">申请季</label>
-                            <select id="applicationSeason">
-                                <option value="Fall 2025">2025秋季</option>
-                                <option value="Spring 2025">2025春季</option>
-                                <option value="Fall 2026">2026秋季</option>
-                                <option value="Spring 2026">2026春季</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="nextFollowupDate">下次提醒日期</label>
-                            <input type="date" id="nextFollowupDate">
-                        </div>
+                    <div class="form-group">
+                        <label for="applicationSeason">申请季</label>
+                        <select id="applicationSeason">
+                            <option value="Fall 2025">2025秋季</option>
+                            <option value="Spring 2025">2025春季</option>
+                            <option value="Fall 2026">2026秋季</option>
+                            <option value="Spring 2026">2026春季</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label for="projectNotes">备注 *</label>
@@ -2232,6 +2239,11 @@
                         <label for="followUpNextAction">下一步行动</label>
                         <textarea id="followUpNextAction" placeholder="下一步需要做什么..." style="min-height: 80px;"></textarea>
                     </div>
+                    <div class="form-group" id="followUpNextDateGroup">
+                        <label for="followUpNextDate">下次提醒日期</label>
+                        <input type="date" id="followUpNextDate">
+                        <small id="followUpReminderHint" style="display: block; margin-top: 4px; font-size: 11px; color: var(--text-muted);"></small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('followUpModal')">取消</button>
@@ -2250,9 +2262,9 @@
         // =====================
         // SUPABASE CONFIGURATION
         // =====================
-        const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';  // 例如: https://xxxxx.supabase.co
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';  // 从 Supabase 控制台获取
-
+        const SUPABASE_URL = 'https://quzcctbipfyhogtcoyoi.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1emNjdGJpcGZ5aG9ndGNveW9pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg5OTQ0MjcsImV4cCI6MjA4NDU3MDQyN30.Da9EAlo0GIEV3p4TNKCs48fmKP0gWLvVdTHrptMMvsU';
+        
         // 配置已设置
         const isConfigured = true;
         
@@ -2467,14 +2479,49 @@
         // 打开回访记录弹窗
         function openFollowUpModal() {
             if (!currentProjectId) return;
-            document.getElementById('followUpProjectId').value = currentProjectId;
-            document.getElementById('followUpForm').reset();
-            document.getElementById('followUpModal').classList.add('active');
+            setupFollowUpModal(currentProjectId);
         }
 
         function openFollowUpModalForProject(projectId) {
+            setupFollowUpModal(projectId);
+        }
+
+        function setupFollowUpModal(projectId) {
             document.getElementById('followUpProjectId').value = projectId;
             document.getElementById('followUpForm').reset();
+            
+            const project = projects.find(p => p.id == projectId);
+            const nextDateGroup = document.getElementById('followUpNextDateGroup');
+            const nextDateInput = document.getElementById('followUpNextDate');
+            const reminderHint = document.getElementById('followUpReminderHint');
+            
+            if (project) {
+                const today = new Date();
+                const startDate = project.startDate ? new Date(project.startDate) : today;
+                const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysSinceStart < 3) {
+                    // Still in 3-day mandatory period
+                    const daysLeft = 3 - daysSinceStart;
+                    nextDateGroup.style.display = 'none'; // Hide the field
+                    reminderHint.textContent = `前3天强制每天提醒，还剩 ${daysLeft} 天`;
+                    reminderHint.style.color = 'var(--warning)';
+                } else {
+                    // After 3 days: allow custom date
+                    nextDateGroup.style.display = 'block';
+                    
+                    // Set default based on priority
+                    const reminderDays = { vip: 1, normal: 7, low: 14 };
+                    const days = reminderDays[project.priority] || 7;
+                    const nextDate = new Date(today);
+                    nextDate.setDate(nextDate.getDate() + days);
+                    nextDateInput.value = nextDate.toISOString().split('T')[0];
+                    
+                    reminderHint.textContent = `已过3天强制期，可自由设定下次联系时间`;
+                    reminderHint.style.color = 'var(--text-muted)';
+                }
+            }
+            
             document.getElementById('followUpModal').classList.add('active');
         }
 
@@ -2486,8 +2533,10 @@
             const method = document.getElementById('followUpMethod').value;
             const content = document.getElementById('followUpContent').value;
             const nextAction = document.getElementById('followUpNextAction').value;
+            const customNextDate = document.getElementById('followUpNextDate')?.value;
             
             try {
+                // Insert follow-up record
                 const { error } = await db
                     .from('follow_ups')
                     .insert({
@@ -2499,6 +2548,45 @@
                     });
                 
                 if (error) throw error;
+                
+                // Update project's next reminder date and last contact date
+                const project = projects.find(p => p.id == projectId);
+                if (project) {
+                    const today = new Date();
+                    const todayStr = today.toISOString().split('T')[0];
+                    
+                    let nextReminderDate;
+                    
+                    // Calculate days since start
+                    const startDate = project.startDate ? new Date(project.startDate) : today;
+                    const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysSinceStart < 3) {
+                        // Still in 3-day mandatory period: remind tomorrow
+                        const tomorrow = new Date(today);
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        nextReminderDate = tomorrow.toISOString().split('T')[0];
+                    } else if (customNextDate) {
+                        // After 3 days: use custom date if provided
+                        nextReminderDate = customNextDate;
+                    } else {
+                        // After 3 days: use priority-based interval
+                        const reminderDays = { vip: 1, normal: 7, low: 14 };
+                        const days = reminderDays[project.priority] || 7;
+                        const nextDate = new Date(today);
+                        nextDate.setDate(nextDate.getDate() + days);
+                        nextReminderDate = nextDate.toISOString().split('T')[0];
+                    }
+                    
+                    // Update project
+                    await db
+                        .from('projects')
+                        .update({
+                            last_contact_date: todayStr,
+                            next_reminder_date: nextReminderDate
+                        })
+                        .eq('id', projectId);
+                }
                 
                 closeModal('followUpModal');
                 showToast(t('followUpAdded'));
@@ -2578,7 +2666,7 @@
                 type: 'Type',
                 targetSchools: 'Target Schools',
                 assignedTo: 'Assigned To',
-                startDate: 'Start Date',
+                startDate: 'Entry Date',
                 deadline: 'Deadline',
                 status: 'Status',
                 actions: 'Actions',
@@ -2738,7 +2826,7 @@
                 type: '类型',
                 targetSchools: '目标学校',
                 assignedTo: '负责人',
-                startDate: '开始日期',
+                startDate: '录入日期',
                 deadline: '截止日期',
                 status: '状态',
                 actions: '操作',
@@ -3893,6 +3981,11 @@
                     fullNotes = extra.join(' | ') + (fullNotes ? '\n\n' + fullNotes : '');
                 }
                 
+                // Set start_date to today, next_reminder to tomorrow (3-day mandatory period)
+                const today = new Date();
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                
                 projectsToInsert.push({
                     client_name: name,
                     client_phone: phone || null,
@@ -3901,7 +3994,8 @@
                     status: defaultStatus,
                     priority: defaultPriority,
                     reminder_days: defaultPriority === 'vip' ? 1 : (defaultPriority === 'low' ? 14 : 7),
-                    next_reminder_date: new Date().toISOString().split('T')[0],
+                    start_date: today.toISOString().split('T')[0],
+                    next_reminder_date: tomorrow.toISOString().split('T')[0],
                     notes: fullNotes || null,
                     project_types: ['studyabroad']
                 });
@@ -4029,6 +4123,8 @@
             document.getElementById('detailWechat').textContent = project.clientWechat || '-';
             document.getElementById('detailPhone').textContent = project.clientPhone || '-';
             document.getElementById('detailStartDate').textContent = formatDate(project.startDate);
+            document.getElementById('detailNextReminder').textContent = formatDate(project.nextReminderDate);
+            document.getElementById('detailLastContact').textContent = formatDate(project.lastContactDate);
             document.getElementById('detailDeadline').textContent = formatDate(project.deadline);
             document.getElementById('detailStatus').innerHTML = `<span class="status-badge ${project.status}">${getStatusText(project.status)}</span>`;
             document.getElementById('detailAssignee').textContent = getUserName(project.assignedTo);
@@ -4043,15 +4139,17 @@
             
             // Update info labels
             const infoLabels = document.querySelectorAll('.detail-main .info-label');
-            if (infoLabels.length >= 7) {
+            if (infoLabels.length >= 9) {
                 infoLabels[0].textContent = t('projectType');
                 infoLabels[1].textContent = t('wechat');
                 infoLabels[2].textContent = t('phone');
                 infoLabels[3].textContent = t('clientEmail');
                 infoLabels[4].textContent = t('startDate');
-                infoLabels[5].textContent = t('deadline');
-                infoLabels[6].textContent = t('status');
-                infoLabels[7].textContent = t('assignedTo');
+                infoLabels[5].textContent = t('nextReminderDate');
+                infoLabels[6].textContent = t('lastContactDate');
+                infoLabels[7].textContent = t('deadline');
+                infoLabels[8].textContent = t('status');
+                infoLabels[9].textContent = t('assignedTo');
             }
 
             // Universities
@@ -4119,6 +4217,25 @@
             document.getElementById('nextFollowupDate').value = project.nextReminderDate || '';
             document.getElementById('applicationSeason').value = project.applicationSeason || 'Fall 2025';
             document.getElementById('projectNotes').value = project.notes || '';
+            
+            // Calculate days since start and show appropriate hint
+            const reminderHint = document.getElementById('reminderHint');
+            if (project.startDate) {
+                const startDate = new Date(project.startDate);
+                const today = new Date();
+                const daysSinceStart = Math.floor((today - startDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysSinceStart <= 3) {
+                    const daysLeft = 3 - daysSinceStart;
+                    reminderHint.textContent = `前3天强制每天提醒，还剩 ${daysLeft} 天`;
+                    reminderHint.style.color = 'var(--warning)';
+                } else {
+                    reminderHint.textContent = '已过3天强制期，可自由设定';
+                    reminderHint.style.color = 'var(--text-muted)';
+                }
+            } else {
+                reminderHint.textContent = '';
+            }
             
             // Set project types
             const types = project.projectTypes || [];
@@ -4353,8 +4470,20 @@
                 document.getElementById('projectModalTitle').textContent = t('addNewProject');
                 document.getElementById('projectForm').reset();
                 document.getElementById('projectId').value = '';
-                document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
-                document.getElementById('nextFollowupDate').value = new Date().toISOString().split('T')[0];
+                
+                // Set start date (录入日期) to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('startDate').value = today;
+                
+                // New projects: remind tomorrow (first 3 days daily reminder)
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                document.getElementById('nextFollowupDate').value = tomorrow.toISOString().split('T')[0];
+                
+                // Show hint for new projects
+                document.getElementById('reminderHint').textContent = '新学员前3天每天提醒';
+                document.getElementById('reminderHint').style.color = 'var(--accent-primary)';
+                
                 document.getElementById('projectPriority').value = 'normal';
                 // Reset checkboxes
                 document.getElementById('typeLanguage').checked = false;
@@ -4531,5 +4660,3 @@
     </script>
 </body>
 </html>
-
-

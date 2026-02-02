@@ -1469,147 +1469,6 @@
         body.is-manager .manager-only-inline {
             display: inline;
         }
-        .projects-table tr.signed-row {
-            background: #FFF5F5 !important;
-            border-left: 4px solid #C44536;
-        }
-
-        .projects-table tr.signed-row:hover td {
-            background: #FFEBEE !important;
-        }
-
-        .projects-table tr.signed-row .client-name {
-            color: #C44536;
-            font-weight: 700;
-        }
-
-        .status-badge.signed {
-            background: #C44536;
-            color: white;
-        }
-
-        .signed-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: #C44536;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
-        /* 新增：操作状态标签 */
-        .progress-status {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            margin-top: 4px;
-        }
-
-        .progress-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .progress-tag.done {
-            background: var(--success-light);
-            color: var(--success);
-        }
-
-        .progress-tag.pending {
-            background: #F5F5F5;
-            color: #9E9E9E;
-        }
-
-        /* 新增：文书老师角色样式 */
-        .user-avatar.copywriter {
-            background: #7B1FA2;
-        }
-
-        .assignee-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .assignee-tag.consultant {
-            background: #E3F2FD;
-            color: #1565C0;
-        }
-
-        .assignee-tag.copywriter {
-            background: #F3E5F5;
-            color: #7B1FA2;
-        }
-
-        /* 新增：操作状态区块 */
-        .status-section {
-            background: var(--bg-accent);
-            border-radius: var(--radius-md);
-            padding: 16px;
-            margin-top: 16px;
-        }
-
-        .status-section-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .status-checkboxes {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-
-        .status-checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 12px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .status-checkbox-item.checked {
-            border-color: var(--success);
-            background: var(--success-light);
-        }
-
-        .status-checkbox-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--success);
-        }
-
-        .stat-card.signed {
-            background: #FFF5F5;
-            border-color: #FFCDD2;
-        }
-
-        .stat-card.signed .stat-value {
-            color: #C44536;
-        }
-
-        @media (max-width: 768px) {
-            .status-checkboxes {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
@@ -1759,10 +1618,6 @@
                         <div class="stat-label">项目总数</div>
                         <div class="stat-value" id="statTotal">0</div>
                     </div>
-                    <div class="stat-card signed">
-                        <div class="stat-label">🔴 已签约</div>
-                        <div class="stat-value" id="statSigned">0</div>
-                    </div>
                     <div class="stat-card">
                         <div class="stat-label">进行中</div>
                         <div class="stat-value" id="statActive">0</div>
@@ -1862,10 +1717,8 @@
                                 <option value="">全部状态</option>
                                 <option value="active">进行中</option>
                                 <option value="pending">待处理</option>
-                                <option value="signed">🔴 已签约</option>
-                                <option value="active">进行中</option>
-                                <option value="urgent">紧急</option>
                                 <option value="completed">已完成</option>
+                                <option value="urgent">紧急</option>
                                 <option value="invalid">❌ 无效</option>
                             </select>
                             <select class="filter-select" id="typeFilter" onchange="filterProjects()">
@@ -2092,11 +1945,6 @@
                         </select>
                     </div>
                     <div class="form-group">
-                            <label for="assignedCopywriter">✍️ 文书老师</label>
-                            <select id="assignedCopywriter">
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Project Type</label>
                         <div class="checkbox-group">
                             <label class="checkbox-item language" id="languageCheckbox">
@@ -2162,23 +2010,6 @@
                             <option value="Fall 2026">2026秋季</option>
                             <option value="Spring 2026">2026春季</option>
                         </select>
-                    </div>
-                    <div class="status-section">
-                        <div class="status-section-title">📋 操作状态（顾问/文书老师可更新）</div>
-                        <div class="status-checkboxes">
-                            <label class="status-checkbox-item" id="brainstormCheckbox">
-                                <input type="checkbox" id="statusBrainstorm" onchange="updateStatusCheckbox('brainstorm')">
-                                <span class="status-label">📝 头脑风暴</span>
-                            </label>
-                            <label class="status-checkbox-item" id="essayCheckbox">
-                                <input type="checkbox" id="statusEssay" onchange="updateStatusCheckbox('essay')">
-                                <span class="status-label">✍️ 文书完成</span>
-                            </label>
-                            <label class="status-checkbox-item" id="submitCheckbox">
-                                <input type="checkbox" id="statusSubmit" onchange="updateStatusCheckbox('submit')">
-                                <span class="status-label">📤 递交完成</span>
-                            </label>
-                        </div>
                     </div>
                     <div class="form-group">
                         <label for="projectNotes">备注 *</label>
@@ -4829,4 +4660,3 @@
     </script>
 </body>
 </html>
-

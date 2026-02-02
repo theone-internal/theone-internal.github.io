@@ -1759,6 +1759,10 @@
                         <div class="stat-label">项目总数</div>
                         <div class="stat-value" id="statTotal">0</div>
                     </div>
+                    <div class="stat-card signed">
+                        <div class="stat-label">🔴 已签约</div>
+                        <div class="stat-value" id="statSigned">0</div>
+                    </div>
                     <div class="stat-card">
                         <div class="stat-label">进行中</div>
                         <div class="stat-value" id="statActive">0</div>
@@ -2158,6 +2162,23 @@
                             <option value="Fall 2026">2026秋季</option>
                             <option value="Spring 2026">2026春季</option>
                         </select>
+                    </div>
+                    <div class="status-section">
+                        <div class="status-section-title">📋 操作状态（顾问/文书老师可更新）</div>
+                        <div class="status-checkboxes">
+                            <label class="status-checkbox-item" id="brainstormCheckbox">
+                                <input type="checkbox" id="statusBrainstorm" onchange="updateStatusCheckbox('brainstorm')">
+                                <span class="status-label">📝 头脑风暴</span>
+                            </label>
+                            <label class="status-checkbox-item" id="essayCheckbox">
+                                <input type="checkbox" id="statusEssay" onchange="updateStatusCheckbox('essay')">
+                                <span class="status-label">✍️ 文书完成</span>
+                            </label>
+                            <label class="status-checkbox-item" id="submitCheckbox">
+                                <input type="checkbox" id="statusSubmit" onchange="updateStatusCheckbox('submit')">
+                                <span class="status-label">📤 递交完成</span>
+                            </label>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="projectNotes">备注 *</label>
